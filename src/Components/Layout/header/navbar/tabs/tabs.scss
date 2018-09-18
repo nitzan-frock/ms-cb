@@ -1,0 +1,29 @@
+@import '../../../../../styles/themeColors.scss';
+
+@mixin noselect() {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+.Active {
+    background-color: $MS-orange;
+}
+
+.Tab {
+    display: flex;
+    cursor: pointer;
+    @include noselect;
+    padding: 0 10px;
+    height: 100%;
+    text-align: center;
+    justify-content: center;
+    &:hover {
+        color: $MS-lightBlue;
+        border-bottom: 2px solid $MS-orange;
+    }
+    border: 1px solid pink;
+}

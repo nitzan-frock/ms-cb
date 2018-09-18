@@ -1,0 +1,10 @@
+@import '../../../../styles/themeColors.scss';
+
+.Navbar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    color: white;
+    height: 100%;
+    border: 1px solid black;
+}

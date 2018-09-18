@@ -1,0 +1,14 @@
+### IMPORTANT ###
+Webpack must remain in the root directory
+
+Site/instructions used for creating react app from scratch:
+https://blog.usejournal.com/creating-a-react-app-from-scratch-f3c693b84658
+
+ See, webpack-dev-server is actually serving the bundled files from memory — once the server stops, 
+ they’re gone. To actually build your files, we’re going to utilize webpack proper — add a script 
+ called build in your package.json with the following command: webpack --mode development. You can 
+ replace development with production, but if you completely omit --mode, it will fall back to the 
+ latter and give you a warning.
+
+css and webpack
+https://medium.com/a-beginners-guide-for-webpack-2/webpack-loaders-css-and-sass-2cc0079b5b3a

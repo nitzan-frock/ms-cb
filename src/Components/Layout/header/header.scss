@@ -1,0 +1,10 @@
+@import '../../../styles/themeColors.scss';
+
+.Header{
+    background-color: $MS-mediumBlue;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+    border: 2px solid red;
+}

@@ -1,0 +1,16 @@
+{
+    "user1": {
+        "displayName": "John Doe",
+        "email": "johndoe@email.com",
+        "type": "admin",
+        "companyID": "company1",
+        "defaultLocation": "building1"
+    },
+    "user2": {
+        "displayName": "Jane Doe",
+        "email": "janedoe@email.com",
+        "type": "admin",
+        "companyID": "company2",
+        "defaultLocation": null
+    }
+}

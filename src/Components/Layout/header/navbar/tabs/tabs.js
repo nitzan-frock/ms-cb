@@ -1,19 +1,17 @@
 import React from 'react';
+import uuid from 'uuid/v1';
 
-import './tabs.scss';
+import Tab from '../../../../UI/tab/tab';
 
-const Tabs = (props) => {
-    return props.tabs.map((name, index) => {
-        const classes = ["Tab"];
-        if (props.activeTab === name) {
-            classes.push("Active");
-        }
+const tabs = (props) => {
+    const tabs = ["Resources", "Machines", "Data Monitor"];
+
+    return tabs.map(name => {
+        const active = props.activeTab === name.toLowerCase() ? true : false;
         return (
-            <div className={classes.join(" ")} onClick={props.tabClicked(name)} key={name+index}>
-                <p>{name}</p>
-            </div>
-        )
-    })
+            <Tab key={uuid()} active={active} clicked={props.tabClicked} name={name} />
+        );
+    });
 };
 
-export default Tabs;
+export default tabs;

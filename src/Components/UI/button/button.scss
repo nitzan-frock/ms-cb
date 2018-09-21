@@ -1,0 +1,15 @@
+@import '../../../styles/themeColors.scss';
+@import '../../../styles/mixins.scss';
+
+.button {
+    @include noselect;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    padding: 4px 5px;
+    background-color: $ms-orange;
+    &:hover {
+        background-color: $ms-light-orange;
+    }
+}

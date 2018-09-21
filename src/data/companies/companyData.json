@@ -1,0 +1,146 @@
+{
+    "company1": {
+        "companyName": "company 1",
+        "locations": {
+            "building1": {
+                "displayName": "building 1",
+                "zones": {
+                    "zone1": {
+                        "displayName": "zone 1",
+                        "machines": {
+                            "machine1": {
+                                "displayName": "machine 1",
+                                "sensorSerialNumber": "pa-17-000032"
+                            },
+                            "machine2": {
+                                "displayName": "machine 2",
+                                "sensorSerialNumber": "pa-17-000154"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "users": {
+            "user1": {
+                "displayName": "John Doe",
+                "email": "johndoe@company1.com",
+                "type": "admin"
+            },
+            "user2": {
+                "displayName": "Jane Doe",
+                "email": "janedoe@company1.com",
+                "type": "admin"
+            }
+        },
+        "sensors": {
+            "sensor1": {
+                "serialNumber": "pa-17-000031",
+                "location": null,
+                "zone": null,
+                "machine": null
+            },
+            "sensor2": {
+                "serialNumber": "pa-17-000032",
+                "location": "building1",
+                "zone": "zone1",
+                "machine": "machine1"
+            },
+            "sensor3": {
+                "serialNumber": "pa-17-000154",
+                "location": "building1",
+                "zone": "zone1",
+                "machine": "machine2"
+            }
+        }
+    },
+    "company2": {
+        "companyName": "company 2",
+        "locations": {
+            "building1": {
+                "displayName": "building 1",
+                "zones": {
+                    "zone1": {
+                        "displayName": "zone 1",
+                        "machines": {
+                            "machine1": {
+                                "displayName": "machine 1",
+                                "sensorSerialNumber": "pa-17-000123"
+                            }
+                        }
+                    },
+                    "zone2": {
+                        "displayName": "zone 2",
+                        "machines": {
+                            "machine1": {
+                                "displayName": "machine 3",
+                                "sensorSerialNumber": "pa-17-00049"
+                            }
+                        }
+                    }
+                }
+            },
+            "building2": {
+                "displayName": "building 2",
+                "zones": {
+                    "zone1": {
+                        "displayName": "zone 1",
+                        "machines": {
+                            "machine2": {
+                                "displayName": "machine 2",
+                                "sensorSerialNumber": "vpa-17-00049",
+                                "datahubSerialNumber": "dhb-17-00387"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "users": {
+            "user1": {
+                "displayName": "Jake Baker",
+                "email": "jakebaker@company2.com",
+                "type": "admin"
+            },
+            "user2": {
+                "displayName": "Clive Berger",
+                "email": "cliveberger@company2.com",
+                "type": "admin"
+            }
+        },
+        "datahubs": {
+            "dhb1": {
+                "serialNumber": "dhb-17-00032",
+                "location": null,
+                "machine": null
+            },
+            "dhb2": {
+                "serialNumber": "dhb-17-00387",
+                "location": "building1",
+                "machine": [
+                    "machine2"
+                ]
+            }
+        },
+        "sensors": {
+            "sensor1": {
+                "serialNumber": "pa-17-000123",
+                "location": "building1",
+                "zone": "zone1",
+                "machine": "machine1"
+            },
+            "sensor2": {
+                "serialNumber": "vpa-17-00049",
+                "location": "building2",
+                "zone": "zone1",
+                "machine": "machine2"
+            },
+            "sensor3": {
+                "serialNumber": "pa-17-00049",
+                "location": "building1",
+                "zone": "zone2",
+                "machine": "machine3"
+            }
+        }
+    }
+}

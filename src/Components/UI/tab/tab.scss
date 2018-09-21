@@ -1,0 +1,22 @@
+@import '../../../styles/themeColors.scss';
+@import '../../../styles/mixins.scss';
+
+.active {
+    background-color: $ms-orange;
+    color: white;
+}
+
+.tab {
+    display: flex;
+    cursor: pointer;
+    @include noselect;
+    padding: 0 10px;
+    height: 100%;
+    text-align: center;
+    justify-content: center;
+    box-sizing: border-box;
+    &:hover {
+        color: $ms-light-blue;
+        border-bottom: 4px solid $ms-orange;
+    }
+}

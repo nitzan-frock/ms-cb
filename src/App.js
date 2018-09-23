@@ -15,7 +15,6 @@ class App extends Component{
             activeTab: "resources",
             activeUser: null
         }
-        this.tabClickedHandler = this.tabClickedHandler.bind(this);
     }
 
     async componentDidMount() {
@@ -24,7 +23,7 @@ class App extends Component{
         this.setState({ activeUser: user });
     }
 
-    tabClickedHandler(name){
+    tabClickedHandler = (name) => {
         this.setState({
             activeTab: name.toLowerCase()
         });

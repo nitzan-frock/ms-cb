@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import Aux from '../../../../tools/auxiliary';
+import StringManipulator from '../../../../tools/stringManipulator/StringManipulator';
 import DataRetriever from '../../../../data/DataRetriever';
 import SensorInventory from './sensorInventory/sensorInventory';
 import MachinesOrganizer from './machinesOrganizer/machinesOrganizer';
@@ -40,12 +41,10 @@ class Machines extends Component {
     }
 
     selectedItemChangedHandler = (event) => {
-        console.log(event.target.value);
         this.setState({selectedItem: event.target.value});
     }
 
     showModalHandler = () => {
-        console.log(this.state.showModal);
         const showModal = this.state.showModal;
         this.setState({
             showModal: !showModal, 
@@ -59,20 +58,12 @@ class Machines extends Component {
     }
 
     newItemSNChangedHandler = (event) => {
+        const serialNum = StringManipulator.serialNumberFormatter(event.target.value);
         this.setState({newItemSN: event.target.value});
     }
 
     newItemMACChangedHandler = (event) => {
-        let mac = event.target.value;
-        const re = /([a-f0-9]{2})([a-f0-9]{2})/i;
-        let str = mac.replace(/[^a-f0-9]/ig, "");
-
-        while(re.test(str)){
-            str = str.replace(re, '$1' + ':' + '$2');
-        }
-
-        mac = str.slice(0, 17);
-
+        const mac = StringManipulator.MACAddressFormatter(event.target.value);
         this.setState({newItemMAC: mac});
     }
 

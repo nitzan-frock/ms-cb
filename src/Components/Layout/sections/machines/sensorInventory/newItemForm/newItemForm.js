@@ -6,7 +6,8 @@ const newItemForm = (props) => {
             <input 
                 type="text" 
                 value={props.newItemSN} 
-                onChange={props.newItemSNChanged} 
+                onChange={props.newItemSNChanged}
+                onBlur={props.newItemSNEntered}
                 placeholder="Serial Number"></input>
             <input 
                 type="text" 

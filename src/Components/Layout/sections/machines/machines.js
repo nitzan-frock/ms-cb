@@ -58,8 +58,14 @@ class Machines extends Component {
     }
 
     newItemSNChangedHandler = (event) => {
-        const serialNum = StringManipulator.serialNumberFormatter(event.target.value);
+        console.log(event.target.value);
         this.setState({newItemSN: event.target.value});
+    }
+
+    newItemSNEnteredHandler = (event) => {
+        console.log(event.target.value);
+        const serialNum = StringManipulator.serialNumberFormatter(event.target.value);
+        this.setState({newItemSN: serialNum});
     }
 
     newItemMACChangedHandler = (event) => {
@@ -75,6 +81,7 @@ class Machines extends Component {
                         submitHandler={this.addNewItemHandler}
                         newItemSN={this.state.newItemSN}
                         newItemSNChanged={this.newItemSNChangedHandler}
+                        newItemSNEntered={this.newItemSNEnteredHandler}
                         newItemMAC={this.state.newItemMAC}
                         newItemMACChanged={this.newItemMACChangedHandler} />
                 </Modal>

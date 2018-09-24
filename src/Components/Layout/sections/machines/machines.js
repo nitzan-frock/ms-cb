@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
+import UUID from 'uuid/v1';
+
+import sensorStore from '../../../../data/sensorStore/sensorStore.json';
 
 import Aux from '../../../../tools/auxiliary';
 import StringManipulator from '../../../../tools/stringManipulator/StringManipulator';
-import DataRetriever from '../../../../data/DataRetriever';
+import DataTools from '../../../../data/DataTools';
 import SensorInventory from './sensorInventory/sensorInventory';
 import MachinesOrganizer from './machinesOrganizer/machinesOrganizer';
 import Modal from '../../../UI/modal/modal';
 import NewItemForm from '../../../Layout/sections/machines/sensorInventory/newItemForm/newItemForm';
+import ItemCreator from '../../../../data/Item/ItemCreator';
 
 class Machines extends Component {
     constructor(props){
@@ -22,15 +26,16 @@ class Machines extends Component {
             selectedItem: undefined,
             showModal: false,
             newItemSN: "",
-            newItemMAC: ""
+            newItemMAC: "",
+            invalid: ""
         }
     }
 
     componentDidMount() {
-        const company = DataRetriever.getCompanyName(this.state.companyID);
-        const sensors = DataRetriever.getSensors(this.state.companyID);
-        const datahubs = DataRetriever.getDatahubs(this.state.companyID);
-        const locations = DataRetriever.getLocations(this.state.companyID);
+        const company = DataTools.getCompanyName(this.state.companyID);
+        const sensors = DataTools.getSensors(this.state.companyID);
+        const datahubs = DataTools.getDatahubs(this.state.companyID);
+        const locations = DataTools.getLocations(this.state.companyID);
 
         this.setState({
             company: company,
@@ -39,6 +44,8 @@ class Machines extends Component {
             locations: locations,
         });
     }
+
+    
 
     selectedItemChangedHandler = (event) => {
         this.setState({selectedItem: event.target.value});
@@ -54,7 +61,27 @@ class Machines extends Component {
     }
 
     addNewItemHandler = () => {
-        event.preventDefault();
+        console.log("item added");
+        const serial = this.state.newItemSN;
+        const mac = this.state.newItemMAC.replace(/[^a-z0-9]/ig, "");
+        const valid = (sensorStore[serial] && sensorStore[serial].mac === mac) ? true : false;
+        if (valid) {
+            const newItem = ItemCreator.create(serial, mac, sensorStore);
+            DataTools.addItem(company, newItem);
+
+            if (newItem.isDatahub()){
+                let prevDatahubs = {...this.state.datahubs};
+                console.log("prev hubs");
+                console.log(prevDatahubs);
+
+                console.log(prevDatahubs);
+            }
+            this.setState({
+                newItemSN: "",
+                newItemMAC: "",
+                
+            });
+        }
     }
 
     newItemSNChangedHandler = (event) => {
@@ -83,7 +110,8 @@ class Machines extends Component {
                         newItemSNChanged={this.newItemSNChangedHandler}
                         newItemSNEntered={this.newItemSNEnteredHandler}
                         newItemMAC={this.state.newItemMAC}
-                        newItemMACChanged={this.newItemMACChangedHandler} />
+                        newItemMACChanged={this.newItemMACChangedHandler}
+                        submitForm={this.addNewItemHandler} />
                 </Modal>
                 <SensorInventory 
                     sensors={this.state.sensors} 
@@ -91,8 +119,7 @@ class Machines extends Component {
                     selectedItem={this.state.selectedItem}
                     selectedItemChanged={this.selectedItemChangedHandler}
                     showModal={this.state.showModal}
-                    showModalClicked={this.showModalHandler}
-                    addNewItem={this.addNewItemHandler} />
+                    showModalClicked={this.showModalHandler} />
                 <MachinesOrganizer locations={this.state.locations} />
             </Aux>
         );

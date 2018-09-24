@@ -1,6 +1,11 @@
 import React from 'react';
 
+import Button from '../../../../../UI/button/button'; 
+
 const newItemForm = (props) => {
+    let inputClass = [];
+    if (props.invalid === "serial") inputClass.push("invalid");
+    if (props.invalid === "mac") inputClass.push("invalid");
     return (
         <div>
             <input 
@@ -8,6 +13,7 @@ const newItemForm = (props) => {
                 value={props.newItemSN} 
                 onChange={props.newItemSNChanged}
                 onBlur={props.newItemSNEntered}
+                maxLength="13"
                 placeholder="Serial Number"></input>
             <input 
                 type="text" 
@@ -16,7 +22,7 @@ const newItemForm = (props) => {
                 maxLength="17"
                 placeholder="MAC Address"></input>
             <div>
-                Add Item
+                <Button clicked={props.submitForm} >Add Item</Button>
             </div>
         </div>
     );

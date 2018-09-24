@@ -1,11 +1,15 @@
 @import '../../../styles/themeColors.scss';
 @import '../../../styles/mixins.scss';
 
-.button {
-    @include noselect;
+
+.button-container{
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.button {
+    @include noselect;
     cursor: pointer;
     padding: 4px 5px;
     background-color: $ms-orange;

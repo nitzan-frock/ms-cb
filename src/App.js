@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {hot} from 'react-hot-loader';
 
-import DataRetriever from './data/DataRetriever';
+import DataTools from './data/DataTools';
 import Header from './Components/Layout/header/header';
 import Section from './Components/Layout/sections/section';
 
@@ -18,7 +18,7 @@ class App extends Component{
     }
 
     async componentDidMount() {
-        const user = await DataRetriever.getUser('user1');
+        const user = await DataTools.getUser('user1');
         console.log(user);
         this.setState({ activeUser: user });
     }

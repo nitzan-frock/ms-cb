@@ -33,6 +33,13 @@
                 "type": "admin"
             }
         },
+        "datahubs": {
+            "dhb1": {
+                "serialNumber": "dhb-18-b12486",
+                "location": null,
+                "machine": null
+            }
+        },
         "sensors": {
             "sensor1": {
                 "serialNumber": "pa-17-000031",
@@ -110,12 +117,12 @@
         },
         "datahubs": {
             "dhb1": {
-                "serialNumber": "dhb-17-00032",
+                "serialNumber": "dhb-17-b00032",
                 "location": null,
                 "machine": null
             },
             "dhb2": {
-                "serialNumber": "dhb-17-00387",
+                "serialNumber": "dhb-17-b00387",
                 "location": "building1",
                 "machine": [
                     "machine2"

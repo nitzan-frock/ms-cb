@@ -1,31 +1,44 @@
-import React from 'react';
+import React, { Component } from 'react';
 
-import Button from '../../../../../UI/button/button'; 
+import Form from '../../../../../UI/form/form';
+import Field from '../../../../../UI/form/field';
 
-const newItemForm = (props) => {
-    let inputClass = [];
-    if (props.invalid === "serial") inputClass.push("invalid");
-    if (props.invalid === "mac") inputClass.push("invalid");
-    return (
-        <div>
-            <input 
-                type="text" 
-                value={props.newItemSN} 
-                onChange={props.newItemSNChanged}
-                onBlur={props.newItemSNEntered}
-                maxLength="13"
-                placeholder="Serial Number"></input>
-            <input 
-                type="text" 
-                value={props.newItemMAC} 
-                onChange={props.newItemMACChanged}
-                maxLength="17"
-                placeholder="MAC Address"></input>
-            <div>
-                <Button clicked={props.submitForm} >Add Item</Button>
-            </div>
-        </div>
-    );
+class newItemForm extends Component{
+    componentDidMount(){
+        console.log("[componentDidMount]");
+    }
+
+    shouldComponentUpdate(){
+        console.log("[SCU]");
+        return true;
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        console.log("[cdu]");
+    }
+
+    render() {
+        return (
+            <Form submitForm={this.props.submitForm} buttonName="Add Item">
+                <Field 
+                    name="serial" 
+                    maxLength="13"
+                    placeholder="Serial Number"
+                    invalidEntry={this.props.invalidEntry}
+                    value={this.props.newItemSN} 
+                    changed={this.props.newItemSNChanged} 
+                    unfocus={this.props.newItemSNEntered} />
+                <Field 
+                    name="mac" 
+                    maxLength="17"
+                    placeholder="MAC Address"
+                    invalidEntry={this.props.invalidEntry}
+                    value={this.props.newItemMAC} 
+                    changed={this.props.newItemMACChanged} 
+                    unfocus={this.props.newItemMACEntered} />
+            </Form>
+        );
+    }
 };
 
 export default newItemForm;

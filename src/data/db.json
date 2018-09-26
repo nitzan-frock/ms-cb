@@ -1,0 +1,224 @@
+{
+  "users": [
+    {
+      "id": "user1",
+      "displayName": "John Doe",
+      "email": "johndoe@email.com",
+      "type": "admin",
+      "companyID": "company1",
+      "defaultLocation": "building1"
+    },
+    {
+      "id": "user2",
+      "displayName": "Jane Doe",
+      "email": "janedoe@email.com",
+      "type": "admin",
+      "companyID": "company2",
+      "defaultLocation": null
+    }
+  ],
+  "itemInventory": [
+    {
+      "serial": "pa-17-123456",
+      "mac": "aabbccddeeff",
+      "company": null
+    },
+    {
+      "serial": "dhb-18-b12340",
+      "mac": "b827eb123456",
+      "company": null
+    }
+  ],
+  "companies": [
+    {
+      "id": "company1",
+      "companyName": "Company 1",
+      "locations": [
+        {
+          "id": "building1",
+          "displayName": "building 1",
+          "zones": [
+            {
+              "id": "zone1",
+              "displayName": "zone 1",
+              "machines": [
+                {
+                  "id": "machine1",
+                  "displayName": "machine 1",
+                  "sensorSerial": "pa-17-000032",
+                  "datahubSerial": null
+                },
+                {
+                  "id": "machine2",
+                  "displayName": "machine 2",
+                  "sensorSerial": "pa-17-000154",
+                  "datahubSerial": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "users": [
+        {
+          "id": "user1",
+          "displayName": "John Doe",
+          "email": "johndoe@company1.com",
+          "type": "admin"
+        },
+        {
+          "id": "user2",
+          "displayName": "Jane Doe",
+          "email": "janedoe@company1.com",
+          "type": "admin"
+        }
+      ],
+      "datahubs": [
+        {
+          "id": "dhb1",
+          "serial": "dhb-18-b12486",
+          "mac": "b827eb098765",
+          "location": null,
+          "machine": null
+        }
+      ],
+      "sensors": [
+        {
+          "id": "sensor1",
+          "serial": "pa-17-000031",
+          "mac": "b827eb015af5",
+          "location": null,
+          "zone": null,
+          "machine": null
+        },
+        {
+          "id": "sensor2",
+          "serial": "pa-17-000032",
+          "mac": "b827eba31af5",
+          "location": "building1",
+          "zone": "zone1",
+          "machine": "machine1"
+        },
+        {
+          "id": "sensor3",
+          "serialNumber": "pa-17-000154",
+          "mac": "b827eb09bcd5",
+          "location": "building1",
+          "zone": "zone1",
+          "machine": "machine2"
+        }
+      ]
+    },
+    {
+      "id": "company2",
+      "companyName": "Company 2",
+      "locations": [
+        {
+          "id": "building1",
+          "displayName": "building 1",
+          "zones": [
+            {
+              "id": "zone1",
+              "displayName": "zone 1",
+              "machines": [
+                {
+                  "id": "machine1",
+                  "displayName": "machine 1",
+                  "sensorSerial": "pa-17-000123",
+                  "datahubSerial": null
+                }
+              ]
+            },
+            {
+              "id": "zone2",
+              "displayName": "zone 2",
+              "machines": {
+                "machine1": {
+                  "displayName": "machine 3",
+                  "sensorSerial": "pa-17-00049",
+                  "datahubSerial": null
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "building2",
+          "displayName": "building 2",
+          "zones": [
+            {
+              "id": "zone1",
+              "displayName": "zone 1",
+              "machines": [
+                {
+                  "id": "machine2",
+                  "displayName": "machine 2",
+                  "sensorSerial": "vpa-17-00049",
+                  "datahubSerial": "dhb-17-00387"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "users": [
+        {
+          "id": "user1",
+          "displayName": "Jake Berger",
+          "email": "jakeberger@company2.com",
+          "type": "admin"
+        },
+        {
+          "id": "user2",
+          "displayName": "Clive Baker",
+          "email": "clivebaker@company2.com",
+          "type": "admin"
+        }
+      ],
+      "datahubs": [
+        {
+          "id": "dhb1",
+          "serial": "dhb-17-b00032",
+          "mac": "b827eb34019a",
+          "location": null,
+          "machine": null
+        },
+        {
+          "id": "dhb2",
+          "serial": "dhb-17-b00387",
+          "mac": "b827eb19719a",
+          "location": "building1",
+          "machine": [
+            "machine2"
+          ]
+        }
+      ],
+      "sensors": [
+        {
+          "id": "sensor1",
+          "serial": "pa-17-000123",
+          "mac": "b827eb098af5",
+          "location": "building1",
+          "zone": "zone1",
+          "machine": "machine1"
+        },
+        {
+          "id": "sensor2",
+          "serial": "vpa-17-00049",
+          "mac": "ac2e8b09dbf5",
+          "location": "building2",
+          "zone": "zone1",
+          "machine": "machine2"
+        },
+        {
+          "id": "sensor3",
+          "serial": "pa-17-00049",
+          "mac": "b827ebe38af5",
+          "location": "building1",
+          "zone": "zone2",
+          "machine": "machine3"
+        }
+      ]
+    }
+  ]
+}

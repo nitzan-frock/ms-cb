@@ -7,7 +7,9 @@ export default class DataManipulator {
         this.source = source;
     }
     appendToCompany = (company, item) => {
+        console.log("[appendToCompany]");
         let companyData = this.readFile()[company];
+        console.log(companyData);
         if (item.isDatahub) {
             companyData.datahubs[UUID()] = {
                 serialNumber: item.getSerial,

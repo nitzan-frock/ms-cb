@@ -4,82 +4,116 @@ import UUID from 'uuid/v1';
 import userData from './users/userData.json';
 import companyData from './companies/companyData.json';
 import itemStore from './itemStore/itemStore.json';
-
-const fs = require('fs');
+import DataManipulator from './DataManipulator';
 
 export default class DataTools {
-    static getUser(userID) {
-        return userData[userID];
+    static getUser(user_id) {
+        const url = `http://localhost:8080/users`;
+        return fetch(url)
+            .then(response => response.json())
+            .then(users => users.filter(user => user.id === user_id)[0]);
     }
 
-    static getCompany(company) {
-        return companyData[company];
+    static async getCompany(company_id) {
+        const url = `http://localhost:8080/companies`;
+        let data = await (await (fetch(url)
+            .then(response => {
+                return response.json();
+            })));
+        return data.filter(company => company.id === company_id)[0];
     }
 
-    static getCompanyName(company) {
-        return this.getCompany(company).displayName;
+    static getCompanyName(company_id) {
+        return this.getCompany(company_id).displayName;
     }
 
-    static getSensors(company) {
-        return this.getCompany(company).sensors;
+    static getSensors(company_id) {
+        const sensors = (async () => {
+            const company = await this.getCompany(company_id);
+            return company.sensors;
+        })();
+        console.log(sensors);
     }
 
-    static getDatahubs(company) {
-        return this.getCompany(company).datahubs;
+    static getDatahubs(company_id) {
+        return this.getCompany(company_id).datahubs;
     }
 
-    static getLocations(company) {
-        return this.getCompany(company).locations;
+    static getLocations(company_id) {
+        return this.getCompany(company_id).locations;
     }
 
-    static getZones(company, location) {
-        return this.getLocations(company)[location].zones;
+    static getZones(company_id, location_id) {
+        return this.getLocations(company_id)
+            .filter(location => location.id === location_id);
     }
 
-    static getMachines(company, location, zone) {
-        return this.getLocations(company)[location].zones[zone];
+    static getMachines(company_id, location_id, zone_id) {
+        return this.getZones(company_id, location_id)
+            .filter(zone => zone.id === zone_id);
     }
 
-    static addNewItem(item, company) {
+    static getItems() {
+        const url = `http://localhost:8080/itemInventory`;
+
+        return fetch(url).then(response => response.json()).then(json => json.map(item => {
+            //console.log(item);
+            return item;
+        }));
+    }
+
+    static addNewItem(item, company_id) {
         try {
-            return this._addItemToCompanyInventory(item, company);
+            return this._addItemToCompanyInventory(item, company_id);
         } 
         catch (exception) {
             throw exception;
         }
     }
 
-    static _addItemToCompanyInventory(item, company) {
+    static _addItemToCompanyInventory(item, company_id) {
+        console.log(company_id);
         if (this._isItemValid(item)){
             // TODO: add item to co.
-            if (item.isDatahub) {
-                companyData[company].datahubs[UUID()] = {
-                    serialNumber: item.getSerial,
-                    mac: item.getMAC,
-                    location: null,
-                    machine: null
-                }
-            } else {
-                companyData[company].sensors[UUID()] = {
-                    serialNumber: item.getSerial,
-                    mac: item.getMAC,
-                    location: null,
-                    machine: null
-                }
-            }
+            const appender = new DataManipulator(companyData);
+            console.log(company_id);
+            //appender.appendToCompany(company_id, item);
         } else {
             this._resolveInvalidEntry(item);
         }
     }
 
-    static _resolveInvalidEntry(item) {
-        if (item.getSerial() === "" || item.getMAC() === "") throw "blank";
-        if (!itemStore[item.getSerial()]) throw "serial";
-        if (itemStore[item.getSerial()].mac !== item.getMAC()) throw "mac";
+    static _resolveInvalidEntry(target) {
+        if (target.getSerial() === "" || target.getMAC() === "") throw "blank";
+
+        const validSerial = this.getItems().every(item => {
+            if (item.serial !== target.getSerial()) return false;
+            return true;
+        });
+        console.log("valid serial: " + validSerial);
+        const validMAC = this.getItems().some(item => {
+            if (validSerial && item.mac !== target.getMAC()) return false;
+            return true;
+        });
+        console.log("valid mac: " + validMAC);
+        const unavailable = this.getItems().some(item => {
+            if (validSerial && validMAC && !item.company) return false;
+            return true;
+        });
+        console.log("unavailable: " + unavailable);
+        
+        if (!validSerial) throw "serial";
+        if (!validMAC) throw "mac";
+        if (unavailable) throw 'unavailable';
     }
 
-    static _isItemValid(item) {
-        if (itemStore[item.getSerial] && itemStore[item.getSerial].mac === item.getMAC) return true;
-        return false;
+    static _isItemValid(target) {
+        console.log(this.getSensors("company1"));
+        return this.getItems().some(item => {
+            console.log(`checking valid`);
+            console.log(item);
+            console.log("valid? " + !item.company && item.serial === target.getSerial() && item.mac === target.getMAC());
+            return !item.company && item.serial === target.getSerial() && item.mac === target.getMAC();
+        });
     }
 }

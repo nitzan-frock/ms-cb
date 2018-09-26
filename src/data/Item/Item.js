@@ -2,7 +2,6 @@ class Item {
     constructor(serial, mac){
         this.serial = serial;
         this.mac = mac;
-        this.invalid = null;
     }
 
     getSerial = () => this.serial;

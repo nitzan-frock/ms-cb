@@ -4,19 +4,6 @@ import Form from '../../../../../UI/form/form';
 import Field from '../../../../../UI/form/field';
 
 class newItemForm extends Component{
-    componentDidMount(){
-        console.log("[componentDidMount]");
-    }
-
-    shouldComponentUpdate(){
-        console.log("[SCU]");
-        return true;
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        console.log("[cdu]");
-    }
-
     render() {
         return (
             <Form submitForm={this.props.submitForm} buttonName="Add Item">

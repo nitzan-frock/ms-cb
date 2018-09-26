@@ -5,6 +5,8 @@ import userData from './users/userData.json';
 import companyData from './companies/companyData.json';
 import itemStore from './itemStore/itemStore.json';
 
+const fs = require('fs');
+
 export default class DataTools {
     static getUser(userID) {
         return userData[userID];

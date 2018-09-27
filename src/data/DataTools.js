@@ -14,36 +14,34 @@ export default class DataTools {
             .then(users => users.filter(user => user.id === user_id)[0]);
     }
 
-    static async getCompany(company_id) {
+    static getCompany(company_id) {
         const url = `http://localhost:8080/companies`;
-        let data = await (await (fetch(url)
+        return fetch(url)
             .then(response => {
                 return response.json();
-            })));
-        return data.filter(company => company.id === company_id)[0];
+            })
+            .then(companies => {
+                return companies.filter(company => company.id === company_id)[0]
+            });
     }
 
-    static getCompanyName(company_id) {
-        return this.getCompany(company_id).displayName;
+    static async getCompanyName(company_id) {
+        return (await this.getCompany(company_id)).displayName;
     }
 
-    static getSensors(company_id) {
-        const sensors = (async () => {
-            const company = await this.getCompany(company_id);
-            return company.sensors;
-        })();
-        console.log(sensors);
+    static async getSensors(company_id) {
+        return (await this.getCompany(company_id)).sensors;
     }
 
-    static getDatahubs(company_id) {
-        return this.getCompany(company_id).datahubs;
+    static async getDatahubs(company_id) {
+        return (await this.getCompany(company_id)).datahubs;
     }
 
-    static getLocations(company_id) {
-        return this.getCompany(company_id).locations;
+    static async getLocations(company_id) {
+        return (await this.getCompany(company_id)).locations;
     }
 
-    static getZones(company_id, location_id) {
+    static async getZones(company_id, location_id) {
         return this.getLocations(company_id)
             .filter(location => location.id === location_id);
     }
@@ -57,7 +55,6 @@ export default class DataTools {
         const url = `http://localhost:8080/itemInventory`;
 
         return fetch(url).then(response => response.json()).then(json => json.map(item => {
-            //console.log(item);
             return item;
         }));
     }
@@ -72,11 +69,9 @@ export default class DataTools {
     }
 
     static _addItemToCompanyInventory(item, company_id) {
-        console.log(company_id);
         if (this._isItemValid(item)){
             // TODO: add item to co.
             const appender = new DataManipulator(companyData);
-            console.log(company_id);
             //appender.appendToCompany(company_id, item);
         } else {
             this._resolveInvalidEntry(item);
@@ -107,12 +102,12 @@ export default class DataTools {
         if (unavailable) throw 'unavailable';
     }
 
-    static _isItemValid(target) {
-        console.log(this.getSensors("company1"));
-        return this.getItems().some(item => {
+    static async _isItemValid(target) {
+        return (await this.getItems()).some(item => {
             console.log(`checking valid`);
             console.log(item);
-            console.log("valid? " + !item.company && item.serial === target.getSerial() && item.mac === target.getMAC());
+            console.log(target);
+            console.log("valid? " + (!item.company && item.serial === target.getSerial() && item.mac === target.getMAC()));
             return !item.company && item.serial === target.getSerial() && item.mac === target.getMAC();
         });
     }

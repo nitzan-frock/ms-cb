@@ -14,7 +14,7 @@ class Machines extends Component {
     constructor(props){
         super(props);
         this.state = {
-            companyID: this.props.activeUser.companyID,
+            companyID: this.props.activeUser.company_id,
             companyDisplayName: null,
             sensors: null,
             datahubs: null,
@@ -67,6 +67,7 @@ class Machines extends Component {
             DataTools.addNewItem(ItemCreator.create(serial, mac), company);
         }
         catch (e) {
+            console.log(e);
             this.setState({invalidEntry: e});
         }
     }

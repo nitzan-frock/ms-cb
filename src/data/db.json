@@ -5,7 +5,7 @@
       "displayName": "John Doe",
       "email": "johndoe@email.com",
       "type": "admin",
-      "companyID": "company1",
+      "company_id": "company1",
       "defaultLocation": "building1"
     },
     {
@@ -13,7 +13,23 @@
       "displayName": "Jane Doe",
       "email": "janedoe@email.com",
       "type": "admin",
-      "companyID": "company2",
+      "company_id": "company1",
+      "defaultLocation": null
+    },
+    {
+      "id": "user3",
+      "displayName": "Jake Berger",
+      "email": "jakeberger@company2.com",
+      "type": "admin",
+      "company_id": "company2",
+      "defaultLocation": null
+    },
+    {
+      "id": "user4",
+      "displayName": "Clive Baker",
+      "email": "clivebaker@company2.com",
+      "type": "admin",
+      "company_id": "company2",
       "defaultLocation": null
     }
   ],
@@ -163,13 +179,13 @@
       ],
       "users": [
         {
-          "id": "user1",
+          "id": "user3",
           "displayName": "Jake Berger",
           "email": "jakeberger@company2.com",
           "type": "admin"
         },
         {
-          "id": "user2",
+          "id": "user4",
           "displayName": "Clive Baker",
           "email": "clivebaker@company2.com",
           "type": "admin"

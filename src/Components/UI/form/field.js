@@ -7,7 +7,6 @@ const field = (props) => {
     if (props.invalidEntry === props.name || props.invalidEntry === "blank"){
         styleClass.push("invalid");
     }
-    console.log(styleClass);
     return (
         <input 
                 className={styleClass.join(" ")}

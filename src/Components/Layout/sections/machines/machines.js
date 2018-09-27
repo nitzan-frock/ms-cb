@@ -58,17 +58,19 @@ class Machines extends Component {
         });
     }
 
-    addNewItemHandler = () => {
+    addNewItemHandler = async () => {
         const company = this.state.companyID;
         const serial = this.state.newItemSN;
         const mac = this.state.newItemMAC.replace(/[^a-z0-9]/ig, "");
 
         try {
-            DataTools.addNewItem(ItemCreator.create(serial, mac), company);
+            const response = await DataTools.addItemToCompanyInventory(ItemCreator.create(serial, mac), company);
+            if (!response.ok){
+                throw response.msg;
+            }
         }
-        catch (e) {
-            console.log(e);
-            this.setState({invalidEntry: e});
+        catch (err) {
+            this.setState({invalidEntry: err});
         }
     }
 

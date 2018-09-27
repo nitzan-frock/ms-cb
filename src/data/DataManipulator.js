@@ -6,39 +6,60 @@ export default class DataManipulator {
     constructor(source){
         this.source = source;
     }
-    appendToCompany = (company, item) => {
-        console.log("[appendToCompany]");
-        let companyData = this.readFile()[company];
-        console.log(companyData);
-        if (item.isDatahub) {
-            companyData.datahubs[UUID()] = {
-                serialNumber: item.getSerial,
-                mac: item.getMAC,
-                location: null,
-                machine: null
-            }
-        } else {
-            companyData.sensors[UUID()] = {
-                serialNumber: item.getSerial,
-                mac: item.getMAC,
-                location: null,
-                machine: null
-            }
-        }
-        this.writeFile(companyData);
+
+    appendToCompany = (item) => {
+        const serial = item.getSerial();
+        const mac = item.getMAC();
+        const itemData = {
+            serial: serial,
+            mac: mac,
+            location: null,
+            zone: null,
+            machine: null
+        };
+
+        console.log(itemData);
+
+        return fetch(this.source, {
+            method: 'POST',
+            header: {"Content-Type": "application/json; charset=utf-8"},
+            body: JSON.stringify(itemData)
+        }).then(res => res.json()).then(data => console.log(data));
     }
 
-    readFile = () => {
-        fs.readFile(this.source, 'utf8', (err, file) => {
-            if (err) console.log(err);
-            else {
-                return JSON.parse(file);
-            }
-        });
-    }
+    // appendToCompany = (company, item) => {
+    //     console.log("[appendToCompany]");
+    //     let companyData = this.readFile()[company];
+    //     console.log(companyData);
+    //     if (item.isDatahub) {
+    //         companyData.datahubs[UUID()] = {
+    //             serialNumber: item.getSerial,
+    //             mac: item.getMAC,
+    //             location: null,
+    //             machine: null
+    //         }
+    //     } else {
+    //         companyData.sensors[UUID()] = {
+    //             serialNumber: item.getSerial,
+    //             mac: item.getMAC,
+    //             location: null,
+    //             machine: null
+    //         }
+    //     }
+    //     this.writeFile(companyData);
+    // }
+
+    // readFile = () => {
+    //     fs.readFile(this.source, 'utf8', (err, file) => {
+    //         if (err) console.log(err);
+    //         else {
+    //             return JSON.parse(file);
+    //         }
+    //     });
+    // }
     
-    writeFile = (data) => {
-        json = JSON.stringify(data);
-        fs.writeFile(this.source, json, 'utf8', callback);
-    }
+    // writeFile = (data) => {
+    //     json = JSON.stringify(data);
+    //     fs.writeFile(this.source, json, 'utf8', callback);
+    // }
 }

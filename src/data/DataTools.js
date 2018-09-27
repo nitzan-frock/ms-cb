@@ -7,22 +7,16 @@ import itemStore from './itemStore/itemStore.json';
 import DataManipulator from './DataManipulator';
 
 export default class DataTools {
-    static getUser(user_id) {
+    static async getUser(user_id) {
         const url = `http://localhost:8080/users`;
-        return fetch(url)
-            .then(response => response.json())
-            .then(users => users.filter(user => user.id === user_id)[0]);
+        let data = (await fetch(url).then(res => res.json()));
+        return data.filter(user => user.id === user_id)[0];
     }
 
-    static getCompany(company_id) {
+    static async getCompany(company_id) {
         const url = `http://localhost:8080/companies`;
-        return fetch(url)
-            .then(response => {
-                return response.json();
-            })
-            .then(companies => {
-                return companies.filter(company => company.id === company_id)[0]
-            });
+        let data = (await fetch(url).then(res => res.json()));
+        return data.filter(company => company.id === company_id)[0];
     }
 
     static async getCompanyName(company_id) {
@@ -51,64 +45,55 @@ export default class DataTools {
             .filter(zone => zone.id === zone_id);
     }
 
-    static getItems() {
+    static async getAvailableInventory() {
         const url = `http://localhost:8080/itemInventory`;
-
-        return fetch(url).then(response => response.json()).then(json => json.map(item => {
-            return item;
-        }));
+        return (await fetch(url).then(res => res.json()));
     }
 
-    static addNewItem(item, company_id) {
-        try {
-            return this._addItemToCompanyInventory(item, company_id);
-        } 
-        catch (exception) {
-            throw exception;
-        }
-    }
-
-    static _addItemToCompanyInventory(item, company_id) {
-        if (this._isItemValid(item)){
+    static async addItemToCompanyInventory(item, company_id) {
+        const inventory = await this.getAvailableInventory();
+        const isValid = await this._isItemValid(item, inventory);
+        if (isValid){
             // TODO: add item to co.
-            const appender = new DataManipulator(companyData);
+            const url = `http://localhost:8080/companies?id=${company_id}`;
+            const appender = new DataManipulator(url);
+            appender.appendToCompany(item);
+            return {ok: true, msg: "success"};
             //appender.appendToCompany(company_id, item);
         } else {
-            this._resolveInvalidEntry(item);
+            const err = this._resolveInvalidEntry(item, inventory);
+            return {ok: false, msg: err};
         }
     }
 
-    static _resolveInvalidEntry(target) {
-        if (target.getSerial() === "" || target.getMAC() === "") throw "blank";
+    static _isItemValid(target, inventory) {
+        return inventory.some(item => {
+            return item.company === null && 
+                item.serial === target.getSerial() && 
+                item.mac === target.getMAC();
+        });
+    }
 
-        const validSerial = this.getItems().every(item => {
+    static _resolveInvalidEntry(target, inventory) {
+        if (target.getSerial() === "" || target.getMAC() === "") return "blank";
+
+        const validSerial = inventory.some(item => {
             if (item.serial !== target.getSerial()) return false;
             return true;
         });
-        console.log("valid serial: " + validSerial);
-        const validMAC = this.getItems().some(item => {
+
+        const validMAC = inventory.some(item => {
             if (validSerial && item.mac !== target.getMAC()) return false;
             return true;
         });
-        console.log("valid mac: " + validMAC);
-        const unavailable = this.getItems().some(item => {
+
+        const unavailable = inventory.some(item => {
             if (validSerial && validMAC && !item.company) return false;
             return true;
         });
-        console.log("unavailable: " + unavailable);
         
-        if (!validSerial) throw "serial";
-        if (!validMAC) throw "mac";
-        if (unavailable) throw 'unavailable';
-    }
-
-    static async _isItemValid(target) {
-        return (await this.getItems()).some(item => {
-            console.log(`checking valid`);
-            console.log(item);
-            console.log(target);
-            console.log("valid? " + (!item.company && item.serial === target.getSerial() && item.mac === target.getMAC()));
-            return !item.company && item.serial === target.getSerial() && item.mac === target.getMAC();
-        });
-    }
+        if (!validSerial) return "serial";
+        if (!validMAC) return "mac";
+        if (unavailable) return 'unavailable';
+    }   
 }

@@ -19,8 +19,7 @@ const sensorInventory = (props) => {
                     items={items} />
                 <Button clicked={props.showModalClicked}>Add New Item</Button>
                 <ul>
-                    <li>add new sensor button</li>
-                    <li>list of sensors with filter by SN, machine</li>
+                    <li>TODO: list of sensors with filter by SN, machine</li>
                 </ul>
             </div>
         </Aux>

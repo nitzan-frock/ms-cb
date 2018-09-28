@@ -1,240 +1,254 @@
 {
   "users": [
     {
-      "id": "user1",
+      "id": 1,
       "displayName": "John Doe",
       "email": "johndoe@email.com",
       "type": "admin",
-      "company_id": "company1",
+      "companyId": 1,
       "defaultLocation": "building1"
     },
     {
-      "id": "user2",
+      "id": 2,
       "displayName": "Jane Doe",
       "email": "janedoe@email.com",
       "type": "admin",
-      "company_id": "company1",
+      "companyId": 1,
       "defaultLocation": null
     },
     {
-      "id": "user3",
+      "id": 3,
       "displayName": "Jake Berger",
       "email": "jakeberger@company2.com",
       "type": "admin",
-      "company_id": "company2",
+      "companyId": 2,
       "defaultLocation": null
     },
     {
-      "id": "user4",
+      "id": 4,
       "displayName": "Clive Baker",
       "email": "clivebaker@company2.com",
       "type": "admin",
-      "company_id": "company2",
+      "companyId": 2,
       "defaultLocation": null
     }
   ],
   "itemInventory": [
     {
+      "id": 1,
       "serial": "pa-17-123456",
       "mac": "aabbccddeeff",
-      "company": null
+      "companyId": 1
     },
     {
+      "id": 2,
       "serial": "dhb-18-b12340",
       "mac": "b827eb123456",
-      "company": null
+      "companyId": 1
     }
   ],
   "companies": [
     {
-      "id": "company1",
-      "companyName": "Company 1",
-      "locations": [
+      "id": 1,
+      "companyName": "Company 1"
+    },
+    {
+      "id": 2,
+      "companyName": "Company 2"
+    }
+  ],
+  "locations": [
+    {
+      "id": 1,
+      "companyId": 1,
+      "displayName": "building 1"
+    },
+    {
+      "id": 2,
+      "companyId": 2,
+      "displayName": "building 1"
+    },
+    {
+      "id": 3,
+      "companyId": 2,
+      "displayName": "building 2"
+    }
+  ],
+  "zones": [
+    {
+      "id": 1,
+      "companyId": 1,
+      "locationID": 1,
+      "displayName": "zone 1"
+    },
+    {
+      "id": 2,
+      "companyId": 2,
+      "locationId": 2,
+      "displayName": "zone 1"
+    },
+    {
+      "id": 3,
+      "companyId": 2,
+      "locationId": 3,
+      "displayName": "zone 1"
+    },
+    {
+      "id": 4,
+      "companyId": 2,
+      "locationId": 3,
+      "displayName": "zone 2"
+    }
+  ],
+  "machines": [
+    {
+      "id": 1,
+      "companyId": 1,
+      "locationId": 1,
+      "zoneId": 1,
+      "displayName": "machine 1",
+      "sensorSerial": "pa-17-000032",
+      "datahubSerial": null
+    },
+    {
+      "id": 2,
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "displayName": "machine 2",
+      "sensorSerial": "pa-17-000154",
+      "datahubSerial": null
+    },
+    {
+      "id": 3,
+      "companyId": 2,
+      "locationId": 3,
+      "zoneId": 4,
+      "displayName": "machine 3",
+      "sensorSerial": "pa-17-000049",
+      "datahubSerial": null
+    },
+    {
+      "id": 4,
+      "companyId": 2,
+      "locationId": 3,
+      "zoneId": 2,
+      "displayName": "machine 1",
+      "sensorSerial": "pa-17-000123",
+      "datahubSerial": null
+    },
+    {
+      "id": 5,
+      "companyId": 2,
+      "locationId": 3,
+      "zoneId": 2,
+      "displayName": "machine 2",
+      "sensorSerial": "vpa-17-000050",
+      "datahubSerial": "dhb-17-b00387"
+    }
+  ],
+  "datahubs": [
+    {
+      "id": 1,
+      "serial": "dhb-18-b12486",
+      "mac": "b827eb098765",
+      "companyId": 1,
+      "locationId": null,
+      "machines": null
+    },
+    {
+      "id": 2,
+      "serial": "dhb-17-b00032",
+      "mac": "b827eb34019a",
+      "companyId": 2,
+      "locationId": null,
+      "machines": null
+    },
+    {
+      "id": 3,
+      "serial": "dhb-17-b00387",
+      "mac": "b827eb19719a",
+      "companyId": 2,
+      "locationId": 2,
+      "machines": [
         {
-          "id": "building1",
-          "displayName": "building 1",
-          "zones": [
-            {
-              "id": "zone1",
-              "displayName": "zone 1",
-              "machines": [
-                {
-                  "id": "machine1",
-                  "displayName": "machine 1",
-                  "sensorSerial": "pa-17-000032",
-                  "datahubSerial": null
-                },
-                {
-                  "id": "machine2",
-                  "displayName": "machine 2",
-                  "sensorSerial": "pa-17-000154",
-                  "datahubSerial": null
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "users": [
-        {
-          "id": "user1",
-          "displayName": "John Doe",
-          "email": "johndoe@company1.com",
-          "type": "admin"
-        },
-        {
-          "id": "user2",
-          "displayName": "Jane Doe",
-          "email": "janedoe@company1.com",
-          "type": "admin"
-        }
-      ],
-      "datahubs": [
-        {
-          "id": "dhb1",
-          "serial": "dhb-18-b12486",
-          "mac": "b827eb098765",
-          "location": null,
-          "machine": null
-        }
-      ],
-      "sensors": [
-        {
-          "id": "sensor1",
-          "serial": "pa-17-000031",
-          "mac": "b827eb015af5",
-          "location": null,
-          "zone": null,
-          "machine": null
-        },
-        {
-          "id": "sensor2",
-          "serial": "pa-17-000032",
-          "mac": "b827eba31af5",
-          "location": "building1",
-          "zone": "zone1",
-          "machine": "machine1"
-        },
-        {
-          "id": "sensor3",
-          "serialNumber": "pa-17-000154",
-          "mac": "b827eb09bcd5",
-          "location": "building1",
-          "zone": "zone1",
-          "machine": "machine2"
+          "zoneId": 2,
+          "machineId": 5
         }
       ]
     },
     {
-      "id": "company2",
-      "companyName": "Company 2",
-      "locations": [
-        {
-          "id": "building1",
-          "displayName": "building 1",
-          "zones": [
-            {
-              "id": "zone1",
-              "displayName": "zone 1",
-              "machines": [
-                {
-                  "id": "machine1",
-                  "displayName": "machine 1",
-                  "sensorSerial": "pa-17-000123",
-                  "datahubSerial": null
-                }
-              ]
-            },
-            {
-              "id": "zone2",
-              "displayName": "zone 2",
-              "machines": {
-                "machine1": {
-                  "displayName": "machine 3",
-                  "sensorSerial": "pa-17-00049",
-                  "datahubSerial": null
-                }
-              }
-            }
-          ]
-        },
-        {
-          "id": "building2",
-          "displayName": "building 2",
-          "zones": [
-            {
-              "id": "zone1",
-              "displayName": "zone 1",
-              "machines": [
-                {
-                  "id": "machine2",
-                  "displayName": "machine 2",
-                  "sensorSerial": "vpa-17-00049",
-                  "datahubSerial": "dhb-17-00387"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "users": [
-        {
-          "id": "user3",
-          "displayName": "Jake Berger",
-          "email": "jakeberger@company2.com",
-          "type": "admin"
-        },
-        {
-          "id": "user4",
-          "displayName": "Clive Baker",
-          "email": "clivebaker@company2.com",
-          "type": "admin"
-        }
-      ],
-      "datahubs": [
-        {
-          "id": "dhb1",
-          "serial": "dhb-17-b00032",
-          "mac": "b827eb34019a",
-          "location": null,
-          "machine": null
-        },
-        {
-          "id": "dhb2",
-          "serial": "dhb-17-b00387",
-          "mac": "b827eb19719a",
-          "location": "building1",
-          "machine": [
-            "machine2"
-          ]
-        }
-      ],
-      "sensors": [
-        {
-          "id": "sensor1",
-          "serial": "pa-17-000123",
-          "mac": "b827eb098af5",
-          "location": "building1",
-          "zone": "zone1",
-          "machine": "machine1"
-        },
-        {
-          "id": "sensor2",
-          "serial": "vpa-17-00049",
-          "mac": "ac2e8b09dbf5",
-          "location": "building2",
-          "zone": "zone1",
-          "machine": "machine2"
-        },
-        {
-          "id": "sensor3",
-          "serial": "pa-17-00049",
-          "mac": "b827ebe38af5",
-          "location": "building1",
-          "zone": "zone2",
-          "machine": "machine3"
-        }
-      ]
+      "serial": "dhb-18-b12340",
+      "mac": "b827eb123456",
+      "companyId": 1,
+      "locationId": null,
+      "machines": null,
+      "id": 4
+    }
+  ],
+  "sensors": [
+    {
+      "id": 1,
+      "serial": "pa-17-000031",
+      "mac": "b827eb015af5",
+      "companyId": 1,
+      "locationId": null,
+      "zoneId": null,
+      "machineId": null
+    },
+    {
+      "id": 2,
+      "serial": "pa-17-000032",
+      "mac": "b827eba31af5",
+      "companyId": 1,
+      "locationId": 1,
+      "zoneId": 1,
+      "machineId": 1
+    },
+    {
+      "id": 3,
+      "serialNumber": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 4,
+      "serial": "pa-17-000123",
+      "mac": "b827eb098af5",
+      "companyId": 2,
+      "locationId": 3,
+      "zoneId": 3,
+      "machineId": 4
+    },
+    {
+      "id": 5,
+      "serial": "vpa-17-000050",
+      "mac": "ac2e8b09dbf5",
+      "companyId": 2,
+      "locationId": 3,
+      "zoneId": 3,
+      "machineId": 5
+    },
+    {
+      "id": 6,
+      "serial": "pa-17-000049",
+      "mac": "b827ebe38af5",
+      "companyId": 2,
+      "locationId": 3,
+      "zoneId": 4,
+      "machineId": 3
+    },
+    {
+      "serial": "pa-17-123456",
+      "mac": "aabbccddeeff",
+      "companyId": 1,
+      "locationId": null,
+      "zoneId": null,
+      "machineId": null,
+      "id": 7
     }
   ]
 }

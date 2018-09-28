@@ -1,0 +1,5 @@
+{
+    "/api/*": "/$1",
+    "/company:companyId/location:locationId/zones": "/zones?companyId=:companyId&locationId=:locationId",
+    "/company:companyId/location:locationId/zone:zoneId/machines": "/machines?companyId=:companyId&locationId=:locationId&zoneId=:zoneId"
+}

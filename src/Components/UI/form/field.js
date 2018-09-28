@@ -4,7 +4,7 @@ import './field.scss';
 
 const field = (props) => {
     let styleClass = ["field"];
-    if (props.invalidEntry === props.name || props.invalidEntry === "blank"){
+    if (props.invalidEntry === props.name || props.invalidEntry === "invalid"){
         styleClass.push("invalid");
     }
     return (

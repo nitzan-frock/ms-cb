@@ -2,7 +2,7 @@ import React from 'react';
 
 const machinesOrganizer = (props) => {
     return (
-        <div>locations, zones, machines</div>
+        <div>MachineOrganizer: locations, zones, machines</div>
     );
 };
 

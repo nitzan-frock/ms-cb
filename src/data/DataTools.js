@@ -1,22 +1,16 @@
-import PropTypes from 'prop-types';
-import UUID from 'uuid/v1';
-
-import userData from './users/userData.json';
-import companyData from './companies/companyData.json';
-import itemStore from './itemStore/itemStore.json';
-import DataManipulator from './DataManipulator';
-
 export default class DataTools {
+    static async _getData(url) {
+        return await (await fetch(url)).json();
+    }
+
     static async getUser(user_id) {
-        const url = `http://localhost:8080/users`;
-        let data = (await fetch(url).then(res => res.json()));
-        return data.filter(user => user.id === user_id)[0];
+        const url = `http://localhost:8080/users/${user_id}`;
+        return await this._getData(url);
     }
 
     static async getCompany(company_id) {
-        const url = `http://localhost:8080/companies`;
-        let data = (await fetch(url).then(res => res.json()));
-        return data.filter(company => company.id === company_id)[0];
+        const url = `http://localhost:8080/companies/${company_id}`;
+        return await this._getData(url); 
     }
 
     static async getCompanyName(company_id) {
@@ -24,58 +18,116 @@ export default class DataTools {
     }
 
     static async getSensors(company_id) {
-        return (await this.getCompany(company_id)).sensors;
+        const url = `http://localhost:8080/companies/${company_id}/sensors`;
+        return await this._getData(url);
     }
 
     static async getDatahubs(company_id) {
-        return (await this.getCompany(company_id)).datahubs;
+        const url = `http://localhost:8080/companies/${company_id}/datahubs`;
+        return await this._getData(url);
     }
 
     static async getLocations(company_id) {
-        return (await this.getCompany(company_id)).locations;
+        const url = `http://localhost:8080/companies/${company_id}/locations`;
+        return await this._getData(url);
     }
 
     static async getZones(company_id, location_id) {
-        return this.getLocations(company_id)
-            .filter(location => location.id === location_id);
+        const url = `http://localhost:8080/company${company_id}/location${location_id}/zones`;
+        return await this._getData(url);
     }
 
-    static getMachines(company_id, location_id, zone_id) {
-        return this.getZones(company_id, location_id)
-            .filter(zone => zone.id === zone_id);
+    static async getMachines(company_id, location_id, zone_id) {
+        const url = `http://localhost:8080/company${company_id}/location${location_id}/zone${zone_id}/machines`;
+        return await this._getData(url);
     }
 
     static async getAvailableInventory() {
         const url = `http://localhost:8080/itemInventory`;
-        return (await fetch(url).then(res => res.json()));
+        return await this._getData(url);
+    }
+
+    static async _postData(url, data) {
+        return await (await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        })).json();
+    }
+
+    static async _putData(url, data){
+        return await (await fetch(url, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        })).json();
     }
 
     static async addItemToCompanyInventory(item, company_id) {
         const inventory = await this.getAvailableInventory();
-        const isValid = await this._isItemValid(item, inventory);
+        const isValid = this._isItemValid(item, inventory);
         if (isValid){
-            // TODO: add item to co.
-            const url = `http://localhost:8080/companies?id=${company_id}`;
-            const appender = new DataManipulator(url);
-            appender.appendToCompany(item);
+            if (item.isDatahub()) await DataTools._addDatahub(item, company_id, inventory);
+            else await DataTools._addSensor(item, company_id, inventory);
             return {ok: true, msg: "success"};
-            //appender.appendToCompany(company_id, item);
         } else {
             const err = this._resolveInvalidEntry(item, inventory);
             return {ok: false, msg: err};
         }
     }
 
+    static async _addSensor(item, company_id, inventory) {
+        const postUrl = `http://localhost:8080/sensors`;
+        const postItem = {
+            serial: item.getSerial(),
+            mac: item.getMAC(),
+            companyId: company_id,
+            locationId: null,
+            zoneId: null,
+            machineId: null
+        };
+        await this._postData(postUrl, postItem);
+        await DataTools._updateInventory(inventory, item, company_id);
+    }
+
+    static async _addDatahub(item, company_id, inventory) {
+        const postUrl = `http://localhost:8080/datahubs`;
+        const postItem = {
+            serial: item.getSerial(),
+            mac: item.getMAC(),
+            companyId: company_id,
+            locationId: null,
+            machines: null
+        };
+        await this._postData(postUrl, postItem);
+        await DataTools._updateInventory(inventory, item, company_id);
+    }
+
+    static async _updateInventory(inventory, item, company_id) {
+        const putUrl = `http://localhost:8080/itemInventory/`;
+        const putItem = inventory.filter(unit => {
+            if (unit.serial === item.getSerial() && unit.mac === item.getMAC()) {
+                unit.companyId = company_id;
+                return unit;
+            }
+        })[0];
+        await this._putData((putUrl + putItem.id), putItem);
+    }
+
     static _isItemValid(target, inventory) {
         return inventory.some(item => {
-            return item.company === null && 
+            return item.companyId === null && 
                 item.serial === target.getSerial() && 
                 item.mac === target.getMAC();
         });
     }
 
     static _resolveInvalidEntry(target, inventory) {
-        if (target.getSerial() === "" || target.getMAC() === "") return "blank";
+        if (target.getSerial() === "" || target.getMAC() === "") return "invalid";
 
         const validSerial = inventory.some(item => {
             if (item.serial !== target.getSerial()) return false;
@@ -88,12 +140,12 @@ export default class DataTools {
         });
 
         const unavailable = inventory.some(item => {
-            if (validSerial && validMAC && !item.company) return false;
+            if (validSerial && validMAC && !item.companyId) return false;
             return true;
         });
         
         if (!validSerial) return "serial";
         if (!validMAC) return "mac";
-        if (unavailable) return 'unavailable';
+        if (unavailable) return "invalid";
     }   
 }

@@ -14,7 +14,7 @@ class Machines extends Component {
     constructor(props){
         super(props);
         this.state = {
-            companyID: this.props.activeUser.company_id,
+            companyId: this.props.activeUser.companyId,
             companyDisplayName: null,
             sensors: null,
             datahubs: null,
@@ -30,10 +30,10 @@ class Machines extends Component {
     }
 
     componentDidMount() {
-        const companyDisplayName = DataTools.getCompanyName(this.state.companyID);
-        const sensors = DataTools.getSensors(this.state.companyID);
-        const datahubs = DataTools.getDatahubs(this.state.companyID);
-        const locations = DataTools.getLocations(this.state.companyID);
+        const companyDisplayName = DataTools.getCompanyName(this.state.companyId);
+        const sensors = DataTools.getSensors(this.state.companyId);
+        const datahubs = DataTools.getDatahubs(this.state.companyId);
+        const locations = DataTools.getLocations(this.state.companyId);
 
         this.setState({
             companyDisplayName: companyDisplayName,
@@ -54,17 +54,18 @@ class Machines extends Component {
         this.setState({
             showModal: !showModal, 
             newItemSN: "",
-            newItemMAC: ""
+            newItemMAC: "",
+            invalidEntry: ""
         });
     }
 
     addNewItemHandler = async () => {
-        const company = this.state.companyID;
+        const company_id = this.state.companyId;
         const serial = this.state.newItemSN;
         const mac = this.state.newItemMAC.replace(/[^a-z0-9]/ig, "");
 
         try {
-            const response = await DataTools.addItemToCompanyInventory(ItemCreator.create(serial, mac), company);
+            const response = await DataTools.addItemToCompanyInventory(ItemCreator.create(serial, mac), company_id);
             if (!response.ok){
                 throw response.msg;
             }

@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { Component } from 'react';
 
-const Resources = () => {
-    return (
-        <div>Resources, get your resources here!</div>        
-    );
-};
-
-export default Resources;  
+export default class Resources extends Component {
+    render() {
+        return (
+            <div>Resources, get your resources here!</div> 
+        );
+    }
+}

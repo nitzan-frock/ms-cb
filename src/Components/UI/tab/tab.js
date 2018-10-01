@@ -8,8 +8,8 @@ const tab = (props) => {
         classes.push("active");
     }
     return (
-        <div className={classes.join(" ")} onClick={() => {props.clicked(props.name)}}>
-            <p>{props.name}</p>
+        <div className={classes.join(" ")} onClick={() => {props.clicked(props.id)}}>
+            <p>{props.tabName}</p>
         </div>
     )
 };

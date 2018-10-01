@@ -1,6 +1,6 @@
 import React from 'react';
-import Resources from './resources/resources';
-import Machines from './machines/machines';
+import Resources from './Resources/resources';
+import Machines from './Machines/machines';
 import DataMonitor from './dataMonitor/dataMonitor';
 
 class SectionFactory {

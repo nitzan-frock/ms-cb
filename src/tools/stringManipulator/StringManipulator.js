@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 export default class StringManipulator extends Component {
     static toTitleCase = (completeStr) => {
         return completeStr.split(" ").map(str => {
-            const titleCaseArr = str.charAt(0).toUpperCase() + str.slice(1);
+            const titleCaseArr = str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
             return titleCaseArr;
         }).join(" ")
     }

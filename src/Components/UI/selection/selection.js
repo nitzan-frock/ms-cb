@@ -12,7 +12,7 @@ const selection = (props) => {
             onChange={props.selectedItemChanged}>
             <option disabled>{props.defaultValue}</option>
             {props.items.map(item => {
-                const itemName = StringManipulator.toTitleCase(item);
+                const itemName = item === 'OEM' ? item : StringManipulator.toTitleCase(item);
                 return (
                     <option key={uuid()} value={item}>{itemName}</option>
                 )

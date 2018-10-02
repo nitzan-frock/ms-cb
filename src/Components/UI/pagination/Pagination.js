@@ -1,6 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
+import './pagination.scss';
+
 const LEFT_PAGE = 'LEFT';
 const RIGHT_PAGE = 'RIGHT';
 
@@ -8,7 +10,7 @@ const RIGHT_PAGE = 'RIGHT';
  * Helper method for creating a range of numbers.
  * range (1, 5) => [1, 2, 3, 4, 5] 
  */
-const range = (start, end, step) => {
+const range = (start, end, step = 1) => {
     let i = start;
     const range = [];
     while (i <= end) {
@@ -31,7 +33,8 @@ export default class Pagination extends Component {
             ? Math.max(0, Math.min(pageNeighbors, 2))
             : 0;
 
-        this.totalPages === Math.ceil(this.totalRecords / this.itemsPerPage);
+        this.totalPages = Math.ceil(this.totalRecords / this.itemsPerPage);
+        console.log('total pages: ' + this.totalPages);
 
         this.state = { currentPage: 1 };
     }
@@ -42,31 +45,34 @@ export default class Pagination extends Component {
 
     gotoPage = page => {
         const { onPageChanged = f => f } = this.props;
+
         const currentPage = Math.max(0, Math.min(page, this.totalPages));
 
         const paginationData = {
             currentPage,
             totalPages: this.totalPages,
-            pageLimit: this.itemsPerPage,
+            itemsPerPage: this.itemsPerPage,
             totalRecords: this.totalRecords
         };
 
-        this.setState({currentPage}), () => onPageChanged(paginationData);
+        this.setState({currentPage}, () => onPageChanged(paginationData));
     }
 
-    handleClick = page => event => {
+    handleClick = (page, event) => {
         event.preventDefault();
         this.gotoPage(page);
     }
 
-    handleMoveLeft = page => event => {
+    handleMoveLeft = event => {
         event.preventDefault();
-        this.gotoPage(this.state.currentPage - (this.pageNeighbors * 2) - 1);
+        const offset = this.pageNeighbors * 2 + 1;
+        this.gotoPage(this.state.currentPage - offset);
     }
 
-    handleMoveLeft = page => event => {
+    handleMoveRight = event => {
         event.preventDefault();
-        this.gotoPage(this.state.currentPage - (this.pageNeighbors * 2) + 1);
+        const offset = this.pageNeighbors * 2 + 1;
+        this.gotoPage(this.state.currentPage + offset);
     }
 
     fetchPageNumbers = () => {
@@ -74,44 +80,44 @@ export default class Pagination extends Component {
         const currentPage = this.state.currentPage;
         const pageNeighbors = this.pageNeighbors;
 
-        /**
-         * totalPageBlocks: total page numbers to show on the control
-         * totalBlocks: totalPageBlocks + 2 to cover for the left (<) and right (>) controls
-         */
-
         const totalPageBlocks = (this.pageNeighbors * 2) + 3;
         const totalBlocks = totalPageBlocks + 2;
 
         if (totalPages > totalBlocks) {
-            const startPage = Math.max(2, currentPage - pageNeighbors);
-            const endPage = Math.min(totalPages - 1, currentPage + pageNeighbors);
+            let pages = [];
 
-            let pages = range(startPage, endPage);
+            const leftBound = currentPage - pageNeighbors;
+            const rightBound = currentPage + pageNeighbors;
+            const beforeLastPage = totalPages - 1;
 
-            /**
-             * hasLeftSpill: has hidden pages to the left
-             * hasRightSpill: has hidden pages to the right
-             * spillOffset: number of hidden pages either to the left or to the right
-             */
+            const startPage = leftBound > 2 ? leftBound : 2;
+            const endPage = rightBound < beforeLastPage ? rightBound : beforeLastPage;
+            pages = range(startPage, endPage);
+
+            const pagesCount = pages.length;
 
             const hasLeftSpill = startPage > 2;
-            const hasRightSpill = endPage < this.totalPages;
-            const spillOffset = totalPageBlocks - (pages.length + 1);
+            const hasRightSpill = endPage < beforeLastPage;
+            const spillOffset = totalPageBlocks - pagesCount - 1;
+            const leftSpillControl = LEFT_PAGE;
+            const rightSpillControl = RIGHT_PAGE;
 
             if (hasLeftSpill && !hasRightSpill) {
                 // handle (1) < {5 6} [7] {8 9} (10)
                 const extraPages = range(startPage - spillOffset, startPage - 1);
-                pages = [LEFT_PAGE, ...extraPages, ...pages];
+                pages = [leftSpillControl, ...extraPages, ...pages];
             } else if (!hasLeftSpill && hasRightSpill) {
                 // handle (1) {2 3} [4] {5 6} > (10)
                 const extraPages = range(endPage + 1, endPage + spillOffset);
-                pages = [...pages, ...extraPages.RIGHT_PAGE];
+                pages = [...pages, ...extraPages, rightSpillControl];
             } else if (hasLeftSpill && hasRightSpill) {
                 // handle (1) < {4 5} [6] {7 8} > (10)
-                pages = [LEFT_PAGE, ...pages, RIGHT_PAGE];
+                pages = [leftSpillControl, ...pages, rightSpillControl];
             }
+
             return [1, ...pages, totalPages];
         }
+
         return range(1, totalPages);
     }
 
@@ -123,11 +129,33 @@ export default class Pagination extends Component {
 
         return (
             <Fragment>
+                <p>choose page</p>
                 <ul className="pagination">
                     {pages.map((page, index) => {
                         if (page === LEFT_PAGE) return (
+                                <li key={index} className="page-item">
+                                    <a 
+                                        className="page-link" 
+                                        href="#" 
+                                        onClick={this.handleMoveLeft}>&laquo;</a>
+                                </li>
+                        );
+                        if (page === RIGHT_PAGE) return (
                             <li key={index} className="page-item">
-                                <a className="page-link" href="#" onClick={this.handleClick(page)}>{page}</a>
+                                <a
+                                    className="page-link"
+                                    href="#"
+                                    onClick={this.handleMoveRight}>&raquo;</a>
+                            </li>
+                        );
+                        return (
+                            <li key={index} className={`page-item ${
+                                    currentPage === page ? "active": ""
+                                }`}>
+                                <a 
+                                    className="page-link"
+                                    href="#"
+                                    onClick={e => this.handleClick(page, e)}>{page}</a>
                             </li>
                         );
                     })}
@@ -139,7 +167,7 @@ export default class Pagination extends Component {
 
 Pagination.propTypes = {
     totalRecords: PropTypes.number.isRequired,
-    pageLimit: PropTypes.number,
+    itemsPerPage: PropTypes.number,
     pageNeighbors: PropTypes.number,
     onPageChanged: PropTypes.func
 };

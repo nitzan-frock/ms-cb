@@ -77,10 +77,7 @@ export default class ItemInventory extends Component {
 
     render() {
         const items = [DATAHUBS, SENSORS, OEM];
-        console.log(items);
         const defaultSelectionValue = "Select A Product"; 
-        console.log('active user');
-        console.log(this.props.activeUser);
         return (
             <>
                 <Modal show={this.state.showModal} modalClosed={this.showModalHandler} >
@@ -101,7 +98,7 @@ export default class ItemInventory extends Component {
                 <Button clicked={this.showModalHandler}>Add New Item</Button>
                 <ItemList 
                     companyId={this.props.activeUser.companyId}
-                    itemSelection={{DATAHUBS, SENSORS, OEM}}
+                    itemSelections={{DATAHUBS, SENSORS, OEM}}
                     selectedItem={this.state.selectedItem} />
                 <ul>
                     <li>TODO: list of sensors with filter by SN, machine</li>

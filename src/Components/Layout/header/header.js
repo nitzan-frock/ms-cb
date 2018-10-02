@@ -7,7 +7,7 @@ import './header.scss';
 
 const Header = (props) => {
     return (
-        <div className="Header">
+        <div className="header">
             <Logo />
             <Navbar {...props}/>
         </div>

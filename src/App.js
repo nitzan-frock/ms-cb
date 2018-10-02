@@ -22,7 +22,7 @@ class App extends Component{
     }
 
     async componentDidMount() {
-        const user = await DataTools.getUser(1);
+        const user = await DataTools.getUser(3);
         this.setState({ activeUser: user });
     }
 

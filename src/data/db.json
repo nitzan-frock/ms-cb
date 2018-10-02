@@ -207,7 +207,7 @@
     },
     {
       "id": 3,
-      "serialNumber": "pa-17-000154",
+      "serial": "pa-17-000154",
       "mac": "b827eb09bcd5",
       "companyId": 2,
       "locationId": 2,
@@ -249,6 +249,132 @@
       "zoneId": null,
       "machineId": null,
       "id": 7
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
+    },
+    {
+      "id": 3,
+      "serial": "pa-17-000154",
+      "mac": "b827eb09bcd5",
+      "companyId": 2,
+      "locationId": 2,
+      "zoneId": 2,
+      "machineId": 2
     }
   ]
 }

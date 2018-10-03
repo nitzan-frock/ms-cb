@@ -10,26 +10,18 @@ import DataTools from '../../../../../data/DataTools';
 import StringManipulator from '../../../../../tools/stringManipulator/StringManipulator';
 
 
-const DATAHUBS = 'DATAHUBS';
-const SENSORS = 'SENSORS';
-const OEM = 'OEM'; 
+
 
 export default class ItemInventory extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedItem: undefined,
             showModal: false,
             newItemSN: "",
             newItemMAC: "",
-            invalidEntry: "",
-            itemsPerPage: 10,
+            invalidEntry: ""
         }
         
-    }
-
-    selectedItemChangedHandler = (event) => {
-        this.setState({selectedItem: event.target.value});
     }
 
     showModalHandler = () => {
@@ -76,8 +68,7 @@ export default class ItemInventory extends Component {
     }
 
     render() {
-        const items = [DATAHUBS, SENSORS, OEM];
-        const defaultSelectionValue = "Select A Product"; 
+         
         return (
             <>
                 <Modal show={this.state.showModal} modalClosed={this.showModalHandler} >
@@ -90,16 +81,9 @@ export default class ItemInventory extends Component {
                         submitForm={this.addNewItemHandler}
                         invalidEntry={this.state.invalidEntry} />
                 </Modal>
-                <Selection 
-                    defaultValue={defaultSelectionValue}
-                    selectedItem={this.state.selectedItem}
-                    selectedItemChanged={this.selectedItemChangedHandler}
-                    items={items} />
                 <Button clicked={this.showModalHandler}>Add New Item</Button>
                 <ItemList 
-                    companyId={this.props.activeUser.companyId}
-                    itemSelections={{DATAHUBS, SENSORS, OEM}}
-                    selectedItem={this.state.selectedItem} />
+                    companyId={this.props.activeUser.companyId} />
                 <ul>
                     <li>TODO: list of sensors with filter by SN, machine</li>
                 </ul>

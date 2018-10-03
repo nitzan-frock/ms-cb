@@ -9,7 +9,7 @@ const selection = (props) => {
         <select
             defaultValue={props.defaultValue}
             value={props.selectedItem}
-            onChange={props.selectedItemChanged}>
+            onChange={props.onSelectionChanged}>
             <option disabled>{props.defaultValue}</option>
             {props.items.map(item => {
                 const itemName = item === 'OEM' ? item : StringManipulator.toTitleCase(item);
@@ -26,7 +26,7 @@ selection.propTypes = {
         PropTypes.string,
         PropTypes.number
     ]).isRequired,
-    selectedItemChanged: PropTypes.func.isRequired,
+    onSelectionChanged: PropTypes.func.isRequired,
     items: PropTypes.arrayOf(PropTypes.string).isRequired
 }
 

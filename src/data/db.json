@@ -45,6 +45,12 @@
       "serial": "dhb-18-b12340",
       "mac": "b827eb123456",
       "companyId": 1
+    },
+    {
+      "id": 3,
+      "serial": "dhb-18-b12345",
+      "mac": "b827eb567890",
+      "companyId": 2
     }
   ],
   "companies": [
@@ -184,6 +190,14 @@
       "locationId": null,
       "machines": null,
       "id": 4
+    },
+    {
+      "serial": "dhb-18-b12345",
+      "mac": "b827eb567890",
+      "companyId": 2,
+      "locationId": null,
+      "machines": null,
+      "id": 5
     }
   ],
   "sensors": [

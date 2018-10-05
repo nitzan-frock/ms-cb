@@ -9,9 +9,6 @@ import ItemCreator from '../../../../../data/Item/ItemCreator';
 import DataTools from '../../../../../data/DataTools';
 import StringManipulator from '../../../../../tools/stringManipulator/StringManipulator';
 
-
-
-
 export default class ItemInventory extends Component {
     constructor(props) {
         super(props);
@@ -19,7 +16,8 @@ export default class ItemInventory extends Component {
             showModal: false,
             newItemSN: "",
             newItemMAC: "",
-            invalidEntry: ""
+            invalidEntry: "",
+            shouldListUpdate: false
         }
         
     }
@@ -36,7 +34,7 @@ export default class ItemInventory extends Component {
 
     addNewItemHandler = async () => {
         // add item on enter key press
-        const company_id = this.props.companyId;
+        const company_id = this.props.activeUser.companyId;
         const serial = this.state.newItemSN;
         const mac = this.state.newItemMAC.replace(/[^a-z0-9]/ig, "");
 
@@ -47,10 +45,16 @@ export default class ItemInventory extends Component {
             if (!response.ok){
                 throw response.msg;
             }
+            this.setShouldListUpdate();
         }
         catch (err) {
             this.setState({invalidEntry: err});
         }
+    }
+
+    setShouldListUpdate = () => {
+        const prevState = this.state;
+        this.setState({shouldListUpdate: !prevState.shouldListUpdate});
     }
 
     newItemSNChangedHandler = (event) => {
@@ -83,7 +87,9 @@ export default class ItemInventory extends Component {
                 </Modal>
                 <Button clicked={this.showModalHandler}>Add New Item</Button>
                 <ItemList 
-                    companyId={this.props.activeUser.companyId} />
+                    companyId={this.props.activeUser.companyId}
+                    refresh={this.state.shouldListUpdate}
+                    setShouldListUpdate={this.setShouldListUpdate} />
                 <ul>
                     <li>TODO: list of sensors with filter by SN, machine</li>
                 </ul>

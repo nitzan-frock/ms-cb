@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import StringManipulator from '../../../tools/stringManipulator/StringManipulator';
-import Selection from '../../UI/selection/selection';
 import Pagination from '../../UI/pagination/Pagination';
 
 export default class Table extends Component {
@@ -14,23 +13,27 @@ export default class Table extends Component {
             showItems: [],
             totalPages: 1,
             itemsPerPage: 10,
+            filters: {},
             prevItems: [],
             prevSelectedItem: undefined
         }
     }
 
+    componentDidMount() {
+        const data = this.props.data;
+        const showItems = data.slice(0, this.state.itemsPerPage);
+        // TODO: initialize filters for headers
+        this.setState({ showItems })
+    }
+
     static getDerivedStateFromProps(props, state) {
-        console.log('get derived state from props');
         if (props.selectedItem !== state.prevSelectedItem) {
             let items = props.data.slice(0, state.itemsPerPage);
-            console.log(`new item`);
-            console.log(props.data);
-            console.log(items);
             return {
+                prevSelectedItem: props.selectedItem,
                 showItems: items
             }
         } else if (JSON.stringify(props.data) !== JSON.stringify(state.prevItems)) {
-            console.log('update items');
             const offset = (state.currentPage - 1) * state.itemsPerPage;
             const showItems = props.data.slice(offset, offset + state.itemsPerPage);
             return {
@@ -39,22 +42,6 @@ export default class Table extends Component {
             }
         }
         return null;
-    }
-
-    componentDidMount() {
-        const data = this.props.data;
-        const showItems = data.slice(0, this.state.itemsPerPage);
-        this.setState({ showItems })
-    }
-
-    componentDidUpdate(prevProps) {
-        
-        // } else if (this.props.refresh) {
-        //     console.log(this.props.refresh);
-        //     console.log(`table needs to be refreshed.`);
-        //     // const showItems = 
-        //     // this.setState({showItems});
-        // }
     }
 
     refreshShownData = data => {
@@ -87,7 +74,12 @@ export default class Table extends Component {
                     <thead>
                         <tr>
                             {this.props.headers.map((header, index) => {
-                                return <th key={index}>{header.name}</th>;
+                                return ( 
+                                    <th key={index}>
+                                        <input value={this.state.filters} placeholder={header.name}/>
+                                        {header.name}
+                                    </th>
+                                );
                             })}
                         </tr>
                         {this.state.showItems.map((item, index) => {

@@ -7,6 +7,7 @@ import Section from './Components/Layout/sections/section';
 
 import './main.scss';
 
+// tabs
 const RESOURCES = 'RESOURCES';
 const MACHINES = 'MACHINES';
 const DATA_MONITOR = 'DATA MONITOR';
@@ -28,7 +29,7 @@ class App extends Component{
 
     tabClickedHandler = (name) => {
         this.setState({
-            activeTab: name.toLowerCase()
+            activeTab: name
         });
     }
 

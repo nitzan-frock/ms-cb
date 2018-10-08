@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
 import Button from '../../../../UI/button/button';
-import Selection from '../../../../UI/selection/selection';
 import Modal from '../../../../UI/modal/modal';
 import NewItemForm from '../itemInventory/newItemForm/newItemForm';
 import ItemList from './ItemList/ItemList';

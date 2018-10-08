@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-import Pagination from '../../../../../UI/pagination/Pagination';
 import DataTools from '../../../../../../data/DataTools';
 import Table from '../../../../../UI/table/Table';
 import Selection from '../../../../../UI/selection/selection';
@@ -22,12 +21,9 @@ export default class ItemList extends Component {
     }
 
 
-    async componentDidUpdate(prevProps, prevState) {
-        console.log(`\nitemList is updated.`);
+    async componentDidUpdate(prevProps) {
         if (prevProps.refresh !== this.props.refresh){
-            console.log(`update the items`);
             const items = await this.updateItems(this.state.selectedItem);
-            console.log(items);
             this.setState({items})
         }
     }
@@ -55,7 +51,6 @@ export default class ItemList extends Component {
         const itemSelections = [DATAHUBS, SENSORS, OEM];
         const defaultSelectionValue = "Select A Product";
 
-        // headers
         const tableHeaders = [
             { name: 'Serial Number', accessor: 'serial' },
             { name: 'MAC Address', accessor: 'mac' },
@@ -64,6 +59,7 @@ export default class ItemList extends Component {
         ]
 
         let table = null;
+
         if (this.state.items.length !== 0) {
             table = (
                 <Table

@@ -9,7 +9,7 @@ const tab = (props) => {
     }
     return (
         <div className={classes.join(" ")} onClick={() => {props.clicked(props.id)}}>
-            <p>{props.tabName}</p>
+            <p>{props.name}</p>
         </div>
     )
 };

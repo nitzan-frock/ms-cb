@@ -6,14 +6,16 @@ import StringManipulator from '../../../../../tools/stringManipulator/StringMani
 
 const tabs = (props) => {
     return props.tabs.map(tab => {
+        console.log(tab);
+        console.log(props.activeTab);
         const active = props.activeTab === tab ? true : false;
         return (
             <Tab 
-            key={uuid()} 
-            active={active} 
-            clicked={props.tabClicked} 
-            id={tab} 
-            tabName={StringManipulator.toTitleCase(tab)} />
+                key={uuid()} 
+                active={active} 
+                clicked={props.tabClicked} 
+                id={tab} 
+                name={StringManipulator.toTitleCase(tab)} />
         );
     });
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import uuid from 'uuid/v1';
 
 import Tab from '../../../../UI/tab/tab';
@@ -6,8 +7,6 @@ import StringManipulator from '../../../../../tools/stringManipulator/StringMani
 
 const tabs = (props) => {
     return props.tabs.map(tab => {
-        console.log(tab);
-        console.log(props.activeTab);
         const active = props.activeTab === tab ? true : false;
         return (
             <Tab 
@@ -21,3 +20,9 @@ const tabs = (props) => {
 };
 
 export default tabs;
+
+tabs.propTypes = {
+    activeTab: PropTypes.string.isRequired,
+    tabClicked: PropTypes.func.isRequired,
+    tabs: PropTypes.arrayOf(PropTypes.string).isRequired
+};

@@ -19,16 +19,59 @@ export default class DataTools {
 
     static async getSensors(company_id) {
         const url = `http://localhost:8080/companies/${company_id}/sensors`;
-        return await this._getData(url);
+        const sensors = await this._getData(url);
+
+        for (let i = 0; i < sensors.length; i++) {
+            const sensor = sensors[i];
+            const location_id = sensor.locationId;
+            const machine_id = sensor.machineId;
+            sensor.location = (await this.getLocations(company_id,location_id))[0].displayName
+
+            if (machine_id) {
+                sensor.machines = (
+                    await this.getMachines(
+                        company_id, 
+                        location_id, 
+                        sensor.zoneId, 
+                        machine_id
+                    )
+                );
+            }
+        }
+        return sensors;
     }
 
     static async getDatahubs(company_id) {
         const url = `http://localhost:8080/companies/${company_id}/datahubs`;
-        return await this._getData(url);
+        const datahubs = await this._getData(url);
+        
+        for (let i = 0; i < datahubs.length; i++) {
+            let datahub = datahubs[i];
+            let location_id = datahub.locationId;
+            datahub.location = (await this.getLocations(company_id,location_id))[0].displayName
+
+            if (datahub.machines) {
+                for (let j = 0; j < datahub.machines.length; j++) {
+                    const machine = datahub.machines[j];
+                    datahub.machines[j].displayName = (
+                        await this.getMachines(
+                            company_id, 
+                            location_id, 
+                            machine.zoneId, 
+                            machine.machineId
+                        )
+                    )[0].displayName;
+                }
+            }
+        }
+        return datahubs;
     }
 
-    static async getLocations(company_id) {
-        const url = `http://localhost:8080/companies/${company_id}/locations`;
+    static async getLocations(company_id, location_id) {
+        let url = `http://localhost:8080/companies/${company_id}/locations`;
+        if (location_id) {
+            url = `http://localhost:8080/companies/${company_id}/locations?id=${location_id}`
+        }
         return await this._getData(url);
     }
 
@@ -37,8 +80,11 @@ export default class DataTools {
         return await this._getData(url);
     }
 
-    static async getMachines(company_id, location_id, zone_id) {
-        const url = `http://localhost:8080/company${company_id}/location${location_id}/zone${zone_id}/machines`;
+    static async getMachines(company_id, location_id, zone_id, machine_id) {
+        let url = `http://localhost:8080/machines?companyId=${company_id}&locationId=${location_id}&zoneId=${zone_id}`;
+        if (machine_id) {
+            url = `http://localhost:8080/machines?companyId=${company_id}&locationId=${location_id}&zoneId=${zone_id}&id=${machine_id}`;
+        }
         return await this._getData(url);
     }
 

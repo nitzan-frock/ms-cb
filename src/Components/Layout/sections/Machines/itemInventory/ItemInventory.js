@@ -89,9 +89,6 @@ export default class ItemInventory extends Component {
                     companyId={this.props.activeUser.companyId}
                     refresh={this.state.shouldListUpdate}
                     setShouldListUpdate={this.setShouldListUpdate} />
-                <ul>
-                    <li>TODO: list of sensors with filter by SN, machine</li>
-                </ul>
             </>
         );
     }

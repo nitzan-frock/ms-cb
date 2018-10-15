@@ -102,7 +102,6 @@ export default class Table extends Component {
                     isMatchedToFilter = item[key].match(regEx) ? true : false;
                     return isMatchedToFilter;
                 }
-                
             });
             return isMatch ? item : null;
         });

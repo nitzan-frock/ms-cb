@@ -14,7 +14,7 @@
       "email": "janedoe@email.com",
       "type": "admin",
       "companyId": 1,
-      "defaultLocation": null
+      "defaultLocationId": 2
     },
     {
       "id": 3,
@@ -22,7 +22,7 @@
       "email": "jakeberger@company2.com",
       "type": "admin",
       "companyId": 2,
-      "defaultLocation": null
+      "defaultLocationId": null
     },
     {
       "id": 4,
@@ -30,7 +30,7 @@
       "email": "clivebaker@company2.com",
       "type": "admin",
       "companyId": 2,
-      "defaultLocation": null
+      "defaultLocationId": null
     }
   ],
   "itemInventory": [

@@ -86,9 +86,7 @@ export default class ItemInventory extends Component {
                 </Modal>
                 <Button clicked={this.showModalHandler}>Add New Item</Button>
                 <ItemList 
-                    companyId={this.props.activeUser.companyId}
-                    refresh={this.state.shouldListUpdate}
-                    setShouldListUpdate={this.setShouldListUpdate} />
+                    companyId={this.props.activeUser.companyId} />
             </>
         );
     }

@@ -76,7 +76,7 @@ export default class DataTools {
     }
 
     static async getZones(company_id, location_id) {
-        const url = `http://localhost:8080/company${company_id}/location${location_id}/zones`;
+        const url = `http://localhost:8080/zones?companyId=${company_id}&locationId=${location_id}`;
         return await this._getData(url);
     }
 

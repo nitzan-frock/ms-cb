@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import DataTools from '../../../../../../data/DataTools';
 import Table from '../../../../../UI/table/Table';
 import Selection from '../../../../../UI/selection/selection';
-import Button from '../../../../../UI/button/button';
 
 import './itemList.scss';
 
@@ -21,11 +20,10 @@ export default class ItemList extends Component {
         }
     }
 
-
     async componentDidUpdate(prevProps) {
         if (prevProps.refresh !== this.props.refresh){
             const items = await this.updateItems(this.state.selectedItem);
-            this.setState({items})
+            this.setState({items});
         }
     }
 
@@ -33,7 +31,6 @@ export default class ItemList extends Component {
         let items = [];
         if (type === DATAHUBS) {
             items = await DataTools.getDatahubs(this.props.companyId);
-
         } else if (type === SENSORS) {
             items = await DataTools.getSensors(this.props.companyId);
         } else if (type === OEM) {
@@ -66,6 +63,7 @@ export default class ItemList extends Component {
             table = (
                 <Table
                     filter={this.state.filter}
+                    refresh={this.props.refresh}
                     selectedItem={this.state.selectedItem}
                     data={this.state.items}
                     headers={tableHeaders} />

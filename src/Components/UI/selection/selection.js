@@ -7,15 +7,14 @@ import StringManipulator from '../../../tools/stringManipulator/StringManipulato
 const selection = (props) => {
     return (
         <select
-            defaultValue={props.defaultValue}
-            value={props.selectedItem}
+            value={props.selectedItem ? props.selectedItem : props.defaultValue}
             onChange={props.onSelectionChanged}>
-            <option disabled>{props.defaultValue}</option>
+            {props.defaultValue ? <option disabled>{props.defaultValue}</option> : null}
             {props.items.map(item => {
                 const itemName = item === 'OEM' ? item : StringManipulator.toTitleCase(item);
                 return (
                     <option key={uuid()} value={item}>{itemName}</option>
-                )
+                );
             })}
         </select>
     );
@@ -25,7 +24,7 @@ selection.propTypes = {
     defaultValue: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number
-    ]).isRequired,
+    ]),
     onSelectionChanged: PropTypes.func.isRequired,
     items: PropTypes.arrayOf(PropTypes.string).isRequired
 }

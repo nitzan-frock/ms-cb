@@ -51,6 +51,30 @@
       "serial": "dhb-18-b12345",
       "mac": "b827eb567890",
       "companyId": 2
+    },
+    {
+      "id": 4,
+      "serial": "dhb-18-b23456",
+      "mac": "b827eb098765",
+      "companyId": 2
+    },
+    {
+      "id": 5,
+      "serial": "dhb-18-b11111",
+      "mac": "b827ebaabbcc",
+      "companyId": 2
+    },
+    {
+      "id": 6,
+      "serial": "dhb-18-b22222",
+      "mac": "b827ebaaaaaa",
+      "companyId": 2
+    },
+    {
+      "id": 7,
+      "serial": "dhb-18-b33333",
+      "mac": "b827ebbbbbbb",
+      "companyId": 2
     }
   ],
   "companies": [
@@ -78,6 +102,16 @@
       "id": 3,
       "companyId": 2,
       "displayName": "building 2"
+    },
+    {
+      "id": 4,
+      "companyId": 2,
+      "displayName": "building 3"
+    },
+    {
+      "id": 5,
+      "companyId": 2,
+      "displayName": "building 4"
     }
   ],
   "zones": [
@@ -198,6 +232,38 @@
       "locationId": null,
       "machines": [],
       "id": 5
+    },
+    {
+      "serial": "dhb-18-b23456",
+      "mac": "b827eb098765",
+      "companyId": 2,
+      "locationId": null,
+      "machines": [],
+      "id": 6
+    },
+    {
+      "serial": "dhb-18-b11111",
+      "mac": "b827ebaabbcc",
+      "companyId": 2,
+      "locationId": null,
+      "machines": [],
+      "id": 7
+    },
+    {
+      "serial": "dhb-18-b22222",
+      "mac": "b827ebaaaaaa",
+      "companyId": 2,
+      "locationId": null,
+      "machines": [],
+      "id": 8
+    },
+    {
+      "serial": "dhb-18-b33333",
+      "mac": "b827ebbbbbbb",
+      "companyId": 2,
+      "locationId": null,
+      "machines": [],
+      "id": 9
     }
   ],
   "sensors": [

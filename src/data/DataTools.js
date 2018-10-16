@@ -48,7 +48,7 @@ export default class DataTools {
         for (let i = 0; i < datahubs.length; i++) {
             let datahub = datahubs[i];
             let location_id = datahub.locationId;
-            datahub.location = (await this.getLocations(company_id,location_id))[0].displayName
+            datahub.location = location_id ? (await this.getLocations(company_id,location_id))[0].displayName : null;
 
             if (datahub.machines) {
                 for (let j = 0; j < datahub.machines.length; j++) {
@@ -147,10 +147,14 @@ export default class DataTools {
             mac: item.getMAC(),
             companyId: company_id,
             locationId: null,
-            machines: null
+            machines: []
         };
         await this._postData(postUrl, postItem);
         await DataTools._updateInventory(inventory, item, company_id);
+    }
+
+    static async _updateLocation(location_id, addDatahub, addZone) {
+        const putUrl = `http://localhost:8000/locations?id=${location_id}`
     }
 
     static async _updateInventory(inventory, item, company_id) {

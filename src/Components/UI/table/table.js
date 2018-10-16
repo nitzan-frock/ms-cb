@@ -40,7 +40,13 @@ export default class Table extends Component {
             newState.prevSelectedItem = props.selectedItem;
             newState.filteredItems = props.data;
             newState.shownItems = items;
-        } 
+        }
+
+        if (props.refresh) {
+            newState.filteredItems = props.data;
+            newState.shownItems = props.data.slice(0, state.itemsPerPage);
+        }
+
         return Object.keys(newState).length > 0 ? newState : null;
     }
 

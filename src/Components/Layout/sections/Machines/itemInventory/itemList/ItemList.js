@@ -22,6 +22,7 @@ export default class ItemList extends Component {
 
     async componentDidUpdate(prevProps) {
         if (prevProps.refresh !== this.props.refresh){
+            console.log(`refresh item list: ${this.props.refresh}`);
             const items = await this.updateItems(this.state.selectedItem);
             this.setState({items});
         }
@@ -63,7 +64,6 @@ export default class ItemList extends Component {
             table = (
                 <Table
                     filter={this.state.filter}
-                    refresh={this.props.refresh}
                     selectedItem={this.state.selectedItem}
                     data={this.state.items}
                     headers={tableHeaders} />

@@ -40,11 +40,14 @@ export default class Table extends Component {
             newState.prevSelectedItem = props.selectedItem;
             newState.filteredItems = props.data;
             newState.shownItems = items;
+            newState.currentPage = 1;
+            newState.prevItems = props.data;
         }
 
-        if (props.refresh) {
+        if (JSON.stringify(props.data) !== JSON.stringify(state.prevItems)) {
             newState.filteredItems = props.data;
             newState.shownItems = props.data.slice(0, state.itemsPerPage);
+            newState.prevItems = props.data;
         }
 
         return Object.keys(newState).length > 0 ? newState : null;

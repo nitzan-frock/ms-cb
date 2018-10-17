@@ -150,11 +150,21 @@ export default class DataTools {
             machines: []
         };
         await this._postData(postUrl, postItem);
-        await DataTools._updateInventory(inventory, item, company_id);
+        await this._updateInventory(inventory, item, company_id);
     }
 
     static async _updateLocation(location_id, addDatahub, addZone) {
-        const putUrl = `http://localhost:8000/locations?id=${location_id}`
+        console.log(`update location`);
+        const putUrl = `http://localhost:8000/locations?id=${location_id}`;
+        const location = (await this._getData(putUrl))[0];
+        console.log(location);
+        if (addDatahub) {
+            location.datahubCount = location.datahubCount ? location.datahubCount++ : 1;
+        }
+        if (addZone) {
+            location.zoneCount = location.zoneCount ? location.zoneCount++ : 1;
+        }
+        await this._putData(purUrl, location);
     }
 
     static async _updateInventory(inventory, item, company_id) {

@@ -6,8 +6,8 @@ const locationCards = (props) => {
     return props.locations.map((location, index) => {
         return (
             <Card key={index} title={location.displayName} description={location.description}>
-                <p>Zones: {location.zoneCount}</p>
-                <p>Datahubs: {location.datahubCount}</p>
+                <p>Zones: {location.zoneCount ? location.zoneCount : 0}</p>
+                <p>Datahubs: {location.datahubCount ? location.zoneCount : 0}</p>
             </Card>
         );
     })

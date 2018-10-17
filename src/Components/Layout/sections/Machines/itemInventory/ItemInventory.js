@@ -45,10 +45,12 @@ export default class ItemInventory extends Component {
                 throw response.msg;
             }
             this.setShouldListUpdate();
+            this.setState({invalidEntry: ""})
         }
         catch (err) {
             this.setState({invalidEntry: err});
         }
+        
     }
 
     setShouldListUpdate = () => {

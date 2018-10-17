@@ -117,8 +117,26 @@ export default class DataTools {
         const inventory = await this.getAvailableInventory();
         const isValid = this._isItemValid(item, inventory);
         if (isValid){
-            if (item.isDatahub()) await DataTools._addDatahub(item, company_id, inventory);
-            else await DataTools._addSensor(item, company_id, inventory);
+            if (item.isDatahub()) {
+                const datahub = {
+                    serial: item.getSerial(),
+                    mac: item.getMAC(),
+                    companyId: company_id,
+                    locationId: null,
+                    machines: []
+                }
+                await DataTools._addDatahub(datahub, company_id, inventory);
+            } else {
+                const sensor = {
+                    serial: item.getSerial(),
+                    mac: item.getMAC(),
+                    companyId: company_id,
+                    locationId: null,
+                    zoneId: null,
+                    machineId: null
+                }
+                await DataTools._addSensor(sensor, company_id, inventory);
+            }
             return {ok: true, msg: "success"};
         } else {
             const err = this._resolveInvalidEntry(item, inventory);
@@ -126,31 +144,17 @@ export default class DataTools {
         }
     }
 
-    static async _addSensor(item, company_id, inventory) {
+    static async _addSensor(sensor, company_id, inventory) {
         const postUrl = `http://localhost:8080/sensors`;
-        const postItem = {
-            serial: item.getSerial(),
-            mac: item.getMAC(),
-            companyId: company_id,
-            locationId: null,
-            zoneId: null,
-            machineId: null
-        };
-        await this._postData(postUrl, postItem);
-        await DataTools._updateInventory(inventory, item, company_id);
+        await this._postData(postUrl, sensor);
+        await DataTools._updateInventory(inventory, sensor, company_id);
     }
 
-    static async _addDatahub(item, company_id, inventory) {
+    static async _addDatahub(datahub, company_id, inventory) {
         const postUrl = `http://localhost:8080/datahubs`;
-        const postItem = {
-            serial: item.getSerial(),
-            mac: item.getMAC(),
-            companyId: company_id,
-            locationId: null,
-            machines: []
-        };
-        await this._postData(postUrl, postItem);
-        await this._updateInventory(inventory, item, company_id);
+        console.log(datahub);
+        await this._postData(postUrl, datahub);
+        await this._updateInventory(inventory, datahub, company_id);
     }
 
     static async _updateLocation(location_id, addDatahub, addZone) {
@@ -170,7 +174,7 @@ export default class DataTools {
     static async _updateInventory(inventory, item, company_id) {
         const putUrl = `http://localhost:8080/itemInventory/`;
         const putItem = inventory.filter(unit => {
-            if (unit.serial === item.getSerial() && unit.mac === item.getMAC()) {
+            if (unit.serial === item.serial && unit.mac === item.mac) {
                 unit.companyId = company_id;
                 return unit;
             }

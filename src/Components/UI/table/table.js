@@ -42,11 +42,13 @@ export default class Table extends Component {
             newState.shownItems = items;
             newState.currentPage = 1;
             newState.prevItems = props.data;
+            return newState;
         }
 
         if (JSON.stringify(props.data) !== JSON.stringify(state.prevItems)) {
+            const offset = (state.currentPage -1) * state.itemsPerPage;
             newState.filteredItems = props.data;
-            newState.shownItems = props.data.slice(0, state.itemsPerPage);
+            newState.shownItems = props.data.slice(offset, offset + state.itemsPerPage);
             newState.prevItems = props.data;
         }
 

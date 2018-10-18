@@ -18,7 +18,6 @@ export default class ItemInventory extends Component {
             invalidEntry: "",
             shouldListUpdate: false
         }
-        
     }
 
     showModalHandler = () => {
@@ -33,7 +32,7 @@ export default class ItemInventory extends Component {
 
     addNewItemHandler = async () => {
         // add item on enter key press
-        const company_id = this.props.activeUser.companyId;
+        const company_id = this.props.activeCompany.id;
         const serial = this.state.newItemSN;
         const mac = this.state.newItemMAC.replace(/[^a-z0-9]/ig, "");
 
@@ -50,7 +49,6 @@ export default class ItemInventory extends Component {
         catch (err) {
             this.setState({invalidEntry: err});
         }
-        
     }
 
     setShouldListUpdate = () => {
@@ -88,7 +86,7 @@ export default class ItemInventory extends Component {
                 </Modal>
                 <Button clicked={this.showModalHandler}>Add New Item</Button>
                 <ItemList 
-                    companyId={this.props.activeUser.companyId}
+                    company={this.props.activeCompany}
                     refresh={this.state.shouldListUpdate}
                     setShouldListUpdate={this.setShouldListUpdate} />
             </>

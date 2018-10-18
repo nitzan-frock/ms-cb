@@ -17,7 +17,7 @@ export default class DataTools {
         return (await this.getCompany(company_id)).displayName;
     }
 
-    static async getSensors(company_id) {
+    static async getSensors({company_id}) {
         const url = `http://localhost:8080/companies/${company_id}/sensors`;
         const sensors = await this._getData(url);
 
@@ -25,41 +25,36 @@ export default class DataTools {
             const sensor = sensors[i];
             const location_id = sensor.locationId;
             const machine_id = sensor.machineId;
-            sensor.location = (await this.getLocations(company_id,location_id))[0].displayName
+            sensor.location = (await this.getLocations({location_id}))[0].displayName
 
             if (machine_id) {
-                sensor.machines = (
-                    await this.getMachines(
-                        company_id, 
-                        location_id, 
-                        sensor.zoneId, 
-                        machine_id
-                    )
-                );
+                sensor.machines = await this.getMachines({machine_id});
             }
         }
         return sensors;
     }
 
-    static async getDatahubs(company_id) {
-        const url = `http://localhost:8080/companies/${company_id}/datahubs`;
+    static async getDatahubs({company_id, location_id}) {
+        let url = `http://localhost:8080/companies/${company_id}/datahubs`;
+        
+        if (location_id) {
+            url = `http://localhost:8080/datahubs?locationId=${location_id}`;
+        }
+
         const datahubs = await this._getData(url);
         
         for (let i = 0; i < datahubs.length; i++) {
             let datahub = datahubs[i];
             let location_id = datahub.locationId;
-            datahub.location = location_id ? (await this.getLocations(company_id,location_id))[0].displayName : null;
+            datahub.location = location_id ? (await this.getLocations({location_id}))[0].displayName : null;
 
             if (datahub.machines) {
                 for (let j = 0; j < datahub.machines.length; j++) {
                     const machine = datahub.machines[j];
                     datahub.machines[j].displayName = (
-                        await this.getMachines(
-                            company_id, 
-                            location_id, 
-                            machine.zoneId, 
-                            machine.machineId
-                        )
+                        await this.getMachines({
+                            machine_id: machine.machineId
+                        })
                     )[0].displayName;
                 }
             }
@@ -67,23 +62,25 @@ export default class DataTools {
         return datahubs;
     }
 
-    static async getLocations(company_id, location_id) {
+    static async getLocations({company_id, location_id}) {
         let url = `http://localhost:8080/companies/${company_id}/locations`;
         if (location_id) {
-            url = `http://localhost:8080/companies/${company_id}/locations?id=${location_id}`
+            url = `http://localhost:8080/locations?id=${location_id}`
         }
         return await this._getData(url);
     }
 
-    static async getZones(company_id, location_id) {
-        const url = `http://localhost:8080/zones?companyId=${company_id}&locationId=${location_id}`;
+    static async getZones({location_id}) {
+        const url = `http://localhost:8080/zones?&locationId=${location_id}`;
         return await this._getData(url);
     }
 
-    static async getMachines(company_id, location_id, zone_id, machine_id) {
-        let url = `http://localhost:8080/machines?companyId=${company_id}&locationId=${location_id}&zoneId=${zone_id}`;
-        if (machine_id) {
-            url = `http://localhost:8080/machines?companyId=${company_id}&locationId=${location_id}&zoneId=${zone_id}&id=${machine_id}`;
+    static async getMachines({zone_id, datahub_serial, machine_id}) {
+        let url = `http://localhost:8080/machines?&zoneId=${zone_id}`;
+        if (datahub_serial) {
+            url = `http://localhost:8080/machines?datahubSerial=${datahub_serial}`;
+        } else if (machine_id) {
+            url = `http://localhost:8080/machines?id=${machine_id}`;
         }
         return await this._getData(url);
     }

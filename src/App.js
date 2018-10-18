@@ -18,13 +18,16 @@ class App extends Component{
         this.state = {
             loginSuccess: true,
             activeTab: MACHINES,
-            activeUser: null
+            activeCompany: undefined,
+            activeUser: undefined
         }
     }
 
     async componentDidMount() {
-        const user = await DataTools.getUser(3);
-        this.setState({ activeUser: user });
+        // activeUser should be passed in as a prop on login.
+        const activeUser = await DataTools.getUser(3);
+        const activeCompany = await DataTools.getCompany(2);
+        this.setState({activeCompany, activeUser});
     }
 
     tabClickedHandler = (name) => {
@@ -39,8 +42,8 @@ class App extends Component{
             <div className="App">
                 <Header tabs={tabs} activeTab={this.state.activeTab} tabClicked={this.tabClickedHandler}/>
                 {
-                    this.state.activeUser 
-                    ? <Section activeTab={this.state.activeTab} activeUser={this.state.activeUser} />
+                    this.state.activeCompany 
+                    ? <Section activeTab={this.state.activeTab} activeUser={this.state.activeUser} activeCompany={this.state.activeCompany} />
                     : null
                 }
             </div>

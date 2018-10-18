@@ -11,9 +11,8 @@ const selection = (props) => {
             onChange={props.onSelectionChanged}>
             {props.defaultValue ? <option disabled>{props.defaultValue}</option> : null}
             {props.items.map(item => {
-                const itemName = item === 'OEM' ? item : StringManipulator.toTitleCase(item);
                 return (
-                    <option key={uuid()} value={item}>{itemName}</option>
+                    <option key={uuid()} value={item.value ? item.value : item.displayName}>{item.displayName}</option>
                 );
             })}
         </select>
@@ -26,7 +25,9 @@ selection.propTypes = {
         PropTypes.number
     ]),
     onSelectionChanged: PropTypes.func.isRequired,
-    items: PropTypes.arrayOf(PropTypes.string).isRequired
+    items: PropTypes.arrayOf(PropTypes.shape({
+        displayName: PropTypes.string.isRequired
+    }))
 }
 
 export default selection;

@@ -1,6 +1,7 @@
 {
   "users": [
     {
+      "dataType": "user",
       "id": 1,
       "displayName": "John Doe",
       "email": "johndoe@email.com",
@@ -9,6 +10,7 @@
       "defaultLocation": 1
     },
     {
+      "dataType": "user",
       "id": 2,
       "displayName": "Jane Doe",
       "email": "janedoe@email.com",
@@ -17,6 +19,7 @@
       "defaultLocationId": 2
     },
     {
+      "dataType": "user",
       "id": 3,
       "displayName": "Jake Berger",
       "email": "jakeberger@company2.com",
@@ -25,6 +28,7 @@
       "defaultLocationId": null
     },
     {
+      "dataType": "user",
       "id": 4,
       "displayName": "Clive Baker",
       "email": "clivebaker@company2.com",
@@ -35,78 +39,91 @@
   ],
   "itemInventory": [
     {
+      "sensor": "datahub",
       "id": 1,
       "serial": "pa-17-123456",
       "mac": "aabbccddeeff",
       "companyId": 1
     },
     {
+      "dataType": "datahub",
       "id": 2,
       "serial": "dhb-18-b12340",
       "mac": "b827eb123456",
       "companyId": 1
     },
     {
+      "dataType": "datahub",
       "id": 3,
       "serial": "dhb-18-b12345",
       "mac": "b827eb567890",
       "companyId": 2
     },
     {
+      "dataType": "datahub",
       "id": 4,
       "serial": "dhb-18-b23456",
       "mac": "b827eb098765",
       "companyId": 2
     },
     {
+      "dataType": "datahub",
       "id": 5,
       "serial": "dhb-18-b11111",
       "mac": "b827ebaabbcc",
       "companyId": 2
     },
     {
+      "dataType": "datahub",
       "id": 6,
       "serial": "dhb-18-b22222",
       "mac": "b827ebaaaaaa",
       "companyId": 2
     },
     {
+      "dataType": "datahub",
       "id": 7,
       "serial": "dhb-18-b33333",
       "mac": "b827ebbbbbbb",
       "companyId": 2
     },
     {
+      "dataType": "datahub",
       "id": 8,
       "serial": "dhb-18-b44444",
       "mac": "b827ebcccccc",
       "companyId": 2
     },
     {
+      "dataType": "datahub",
       "id": 9,
       "serial": "dhb-18-b55555",
       "mac": "b827ebdddddd",
       "companyId": 2
     },
     {
+      "dataType": "datahub",
       "id": 10,
       "serial": "dhb-18-b66666",
       "mac": "b827ebeeeeee",
       "companyId": 2
     },
     {
+      "dataType": "datahub",
       "id": 11,
       "serial": "dhb-18-b88888",
       "mac": "b827eb654321",
       "companyId": 2
     },
     {
+      "dataType": "datahub",
       "id": 12,
       "serial": "dhb-18-b99999",
       "mac": "b827eb246813",
       "companyId": 2
     },
     {
+      "dataType": "datahub",
       "id": 13,
       "serial": "dhb-18-b01234",
       "mac": "b827eb012345",
@@ -115,69 +132,95 @@
   ],
   "companies": [
     {
+      "dataType": "company",
       "id": 1,
       "companyName": "Company 1"
     },
     {
+      "dataType": "company",
       "id": 2,
       "companyName": "Company 2"
     }
   ],
   "locations": [
     {
+      "dataType": "location",
       "id": 1,
       "companyId": 1,
-      "displayName": "building 1"
+      "displayName": "building 1",
+      "datahubCount": 0,
+      "zoneCount": 1
     },
     {
+      "dataType": "location",
       "id": 2,
       "companyId": 2,
-      "displayName": "building 1"
+      "displayName": "building 1",
+      "datahubCount": 1,
+      "zoneCount": 1
     },
     {
+      "dataType": "location",
       "id": 3,
       "companyId": 2,
-      "displayName": "building 2"
+      "displayName": "building 2",
+      "datahubCount": 0,
+      "zoneCount": 2
     },
     {
+      "dataType": "location",
       "id": 4,
       "companyId": 2,
-      "displayName": "building 3"
+      "displayName": "building 3",
+      "datahubCount": 0,
+      "zoneCount": 0
     },
     {
+      "dataType": "location",
       "id": 5,
       "companyId": 2,
-      "displayName": "building 4"
+      "displayName": "building 4",
+      "datahubCount": 0,
+      "zoneCount": 0
     }
   ],
   "zones": [
     {
+      "dataType": "zone",
       "id": 1,
       "companyId": 1,
-      "locationID": 1,
-      "displayName": "zone 1"
+      "locationId": 1,
+      "displayName": "zone 1",
+      "machineCount": 1
     },
     {
+      "dataType": "zone",
       "id": 2,
       "companyId": 2,
       "locationId": 2,
-      "displayName": "zone 1"
+      "displayName": "zone 1",
+      "machineCount": 3
     },
     {
+      "dataType": "zone",
       "id": 3,
       "companyId": 2,
       "locationId": 3,
-      "displayName": "zone 1"
+      "displayName": "zone 1",
+      "machineCount": 0
     },
     {
+      "dataType": "zone",
       "id": 4,
       "companyId": 2,
       "locationId": 3,
-      "displayName": "zone 2"
+      "displayName": "zone 2",
+      "machineCount": 1
     }
   ],
   "machines": [
     {
+      "dataType": "machine",
       "id": 1,
       "companyId": 1,
       "locationId": 1,
@@ -187,15 +230,17 @@
       "datahubSerial": ""
     },
     {
+      "dataType": "machine",
       "id": 2,
       "companyId": 2,
       "locationId": 2,
       "zoneId": 2,
-      "displayName": "machine 2",
+      "displayName": "machine 23",
       "sensorSerial": "pa-17-000154",
       "datahubSerial": ""
     },
     {
+      "dataType": "machine",
       "id": 3,
       "companyId": 2,
       "locationId": 3,
@@ -205,6 +250,7 @@
       "datahubSerial": ""
     },
     {
+      "dataType": "machine",
       "id": 4,
       "companyId": 2,
       "locationId": 3,
@@ -214,6 +260,7 @@
       "datahubSerial": ""
     },
     {
+      "dataType": "machine",
       "id": 5,
       "companyId": 2,
       "locationId": 2,
@@ -225,22 +272,27 @@
   ],
   "datahubs": [
     {
+      "dataType": "datahub",
       "id": 1,
       "serial": "dhb-18-b12486",
       "mac": "b827eb098765",
       "companyId": 1,
       "locationId": null,
-      "machines": []
+      "machines": [],
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "id": 2,
       "serial": "dhb-17-b00032",
       "mac": "b827eb34019a",
       "companyId": 2,
       "locationId": null,
-      "machines": []
+      "machines": [],
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "id": 3,
       "serial": "dhb-17-b00387",
       "mac": "b827eb19719a",
@@ -251,115 +303,143 @@
           "zoneId": 2,
           "machineId": 5
         }
-      ]
+      ],
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "serial": "dhb-18-b12340",
       "mac": "b827eb123456",
       "companyId": 1,
       "locationId": null,
       "machines": [],
-      "id": 4
+      "id": 4,
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "serial": "dhb-18-b12345",
       "mac": "b827eb567890",
       "companyId": 2,
       "locationId": null,
       "machines": [],
-      "id": 5
+      "id": 5,
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "serial": "dhb-18-b23456",
       "mac": "b827eb098765",
       "companyId": 2,
       "locationId": null,
       "machines": [],
-      "id": 6
+      "id": 6,
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "serial": "dhb-18-b11111",
       "mac": "b827ebaabbcc",
       "companyId": 2,
       "locationId": null,
       "machines": [],
-      "id": 7
+      "id": 7,
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "serial": "dhb-18-b22222",
       "mac": "b827ebaaaaaa",
       "companyId": 2,
       "locationId": null,
       "machines": [],
-      "id": 8
+      "id": 8,
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "serial": "dhb-18-b33333",
       "mac": "b827ebbbbbbb",
       "companyId": 2,
       "locationId": null,
       "machines": [],
-      "id": 9
+      "id": 9,
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "serial": "dhb-18-b44444",
       "mac": "b827ebcccccc",
       "companyId": 2,
       "locationId": null,
       "machines": [],
-      "id": 10
+      "id": 10,
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "serial": "dhb-18-b55555",
       "mac": "b827ebdddddd",
       "companyId": 2,
       "locationId": null,
       "machines": [],
-      "id": 11
+      "id": 11,
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "serial": "dhb-18-b66666",
       "mac": "b827ebeeeeee",
       "companyId": 2,
       "locationId": null,
       "machines": [],
-      "id": 12
+      "id": 12,
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "serial": "dhb-18-b77777",
       "mac": "b827ebffffff",
       "companyId": 2,
       "locationId": null,
       "machines": [],
-      "id": 13
+      "id": 13,
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "serial": "dhb-18-b88888",
       "mac": "b827eb654321",
       "companyId": 2,
       "locationId": null,
       "machines": [],
-      "id": 14
+      "id": 14,
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "serial": "dhb-18-b99999",
       "mac": "b827eb246813",
       "companyId": 2,
       "locationId": null,
       "machines": [],
-      "id": 15
+      "id": 15,
+      "displayName": ""
     },
     {
+      "dataType": "datahub",
       "serial": "dhb-18-b01234",
       "mac": "b827eb012345",
       "companyId": 2,
       "locationId": null,
       "machines": [],
-      "id": 16
+      "id": 16,
+      "displayName": ""
     }
   ],
   "sensors": [
     {
+      "dataType": "sensor",
       "id": 1,
       "serial": "pa-17-000031",
       "mac": "b827eb015af5",
@@ -369,6 +449,7 @@
       "machineId": null
     },
     {
+      "dataType": "sensor",
       "id": 2,
       "serial": "pa-17-000032",
       "mac": "b827eba31af5",
@@ -378,6 +459,7 @@
       "machineId": 1
     },
     {
+      "dataType": "sensor",
       "id": 3,
       "serial": "pa-17-000154",
       "mac": "b827eb09bcd5",
@@ -387,6 +469,7 @@
       "machineId": 2
     },
     {
+      "dataType": "sensor",
       "id": 4,
       "serial": "pa-17-000123",
       "mac": "b827eb098af5",
@@ -396,6 +479,7 @@
       "machineId": 4
     },
     {
+      "dataType": "sensor",
       "id": 5,
       "serial": "vpa-17-000050",
       "mac": "ac2e8b09dbf5",
@@ -405,6 +489,7 @@
       "machineId": 5
     },
     {
+      "dataType": "sensor",
       "id": 6,
       "serial": "pa-17-000049",
       "mac": "b827ebe38af5",
@@ -414,6 +499,7 @@
       "machineId": 3
     },
     {
+      "dataType": "sensor",
       "serial": "pa-17-123456",
       "mac": "aabbccddeeff",
       "companyId": 1,
@@ -423,6 +509,7 @@
       "id": 7
     },
     {
+      "dataType": "sensor",
       "id": 6,
       "serial": "pa-17-000049",
       "mac": "b827ebe38af5",
@@ -432,6 +519,7 @@
       "machineId": 3
     },
     {
+      "dataType": "sensor",
       "id": 6,
       "serial": "pa-17-000049",
       "mac": "b827ebe38af5",
@@ -441,6 +529,7 @@
       "machineId": 3
     },
     {
+      "dataType": "sensor",
       "id": 6,
       "serial": "pa-17-000049",
       "mac": "b827ebe38af5",
@@ -450,6 +539,7 @@
       "machineId": 3
     },
     {
+      "dataType": "sensor",
       "id": 6,
       "serial": "pa-17-000049",
       "mac": "b827ebe38af5",
@@ -459,6 +549,7 @@
       "machineId": 3
     },
     {
+      "dataType": "sensor",
       "id": 6,
       "serial": "pa-17-000049",
       "mac": "b827ebe38af5",
@@ -468,6 +559,7 @@
       "machineId": 3
     },
     {
+      "dataType": "sensor",
       "id": 6,
       "serial": "pa-17-000049",
       "mac": "b827ebe38af5",
@@ -477,6 +569,7 @@
       "machineId": 3
     },
     {
+      "dataType": "sensor",
       "id": 6,
       "serial": "pa-17-000049",
       "mac": "b827ebe38af5",
@@ -486,6 +579,7 @@
       "machineId": 3
     },
     {
+      "dataType": "sensor",
       "id": 6,
       "serial": "pa-17-000049",
       "mac": "b827ebe38af5",
@@ -495,6 +589,7 @@
       "machineId": 3
     },
     {
+      "dataType": "sensor",
       "id": 6,
       "serial": "pa-17-000049",
       "mac": "b827ebe38af5",
@@ -504,6 +599,7 @@
       "machineId": 3
     },
     {
+      "dataType": "sensor",
       "id": 6,
       "serial": "pa-17-000049",
       "mac": "b827ebe38af5",
@@ -513,6 +609,7 @@
       "machineId": 3
     },
     {
+      "dataType": "sensor",
       "id": 6,
       "serial": "pa-17-000049",
       "mac": "b827ebe38af5",

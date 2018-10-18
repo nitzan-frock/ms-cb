@@ -30,10 +30,11 @@ export default class ItemList extends Component {
 
     updateItems = async (type) => {
         let items = [];
+        const company_id = this.props.company.id;
         if (type === DATAHUBS) {
-            items = await DataTools.getDatahubs(this.props.companyId);
+            items = await DataTools.getDatahubs({company_id});
         } else if (type === SENSORS) {
-            items = await DataTools.getSensors(this.props.companyId);
+            items = await DataTools.getSensors({company_id});
         } else if (type === OEM) {
             items = [OEM];
         }
@@ -48,7 +49,11 @@ export default class ItemList extends Component {
     }
 
     render() {
-        const itemSelections = [DATAHUBS, SENSORS, OEM];
+        const itemSelections = [
+            {value: DATAHUBS, displayName: 'Datahubs'}, 
+            {value: SENSORS, displayName: 'Sensors'}, 
+            {value: OEM, displayName:'OEM'}
+        ];
         const defaultSelectionValue = "Select A Product";
 
         const tableHeaders = [

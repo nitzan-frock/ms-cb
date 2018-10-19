@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import Button from '../../../../UI/button/button';
 import Modal from '../../../../UI/modal/modal';
-import NewItemForm from '../itemInventory/newItemForm/newItemForm';
+import Form from '../../../../UI/form/form';
 import ItemList from './ItemList/ItemList';
 import ItemCreator from '../../../../../data/Item/ItemCreator';
 import DataTools from '../../../../../data/DataTools';
@@ -30,11 +30,11 @@ export default class ItemInventory extends Component {
         });
     }
 
-    addNewItemHandler = async () => {
+    addNewItemHandler = async (values) => {
         // add item on enter key press
         const company_id = this.props.activeCompany.id;
-        const serial = this.state.newItemSN;
-        const mac = this.state.newItemMAC.replace(/[^a-z0-9]/ig, "");
+        const serial = values.serial;
+        const mac = values.mac.replace(/[^a-z0-9]/ig, "");
 
         try {
             const item = ItemCreator.create(serial, mac);
@@ -60,27 +60,45 @@ export default class ItemInventory extends Component {
         this.setState({newItemSN: event.target.value});
     }
 
-    newItemSNEnteredHandler = (event) => {
-        const serialNum = StringManipulator.serialNumberFormatter(event.target.value);
-        this.setState({newItemSN: serialNum});
+    newItemSNEnteredHandler = (str) => {
+        const serial = StringManipulator.serialNumberFormatter(str);
+        console.log(serial);
+        return serial;
     }
 
-    newItemMACChangedHandler = (event) => {
-        const mac = StringManipulator.MACAddressFormatter(event.target.value);
-        this.setState({newItemMAC: mac});
+    newItemMACChangedHandler = (str) => {
+        const mac = StringManipulator.MACAddressFormatter(str);
+        return mac;
     }
 
     render() {
+        const formFields =[
+            {
+                name: "serial",
+                maxLength: 13,
+                placeholder: "Serial Number",
+                options: {
+                    formatter: this.newItemSNEnteredHandler,
+                    formatOn: 'blur'
+                }
+            },
+            {
+                name: "mac",
+                maxLength: 17,
+                placeholder: "MAC Address",
+                options: {
+                    formatter: this.newItemMACChangedHandler,
+                    formatOn: 'change'
+                }
+            }
+        ];
          
         return (
             <>
                 <Modal show={this.state.showModal} modalClosed={this.showModalHandler} >
-                    <NewItemForm 
-                        newItemSN={this.state.newItemSN}
-                        newItemSNChanged={this.newItemSNChangedHandler}
-                        newItemSNEntered={this.newItemSNEnteredHandler}
-                        newItemMAC={this.state.newItemMAC}
-                        newItemMACChanged={this.newItemMACChangedHandler}
+                    <Form 
+                        fields={formFields}
+                        reset={!this.state.showModal}
                         submitForm={this.addNewItemHandler}
                         invalidEntry={this.state.invalidEntry} />
                 </Modal>

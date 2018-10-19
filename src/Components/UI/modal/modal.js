@@ -6,9 +6,10 @@ import Aux from '../../../tools/auxiliary';
 import './modal.scss';
 
 class Modal extends Component {
-    shouldComponentUpdate(nextProps, nextState) {
+    shouldComponentUpdate(nextProps) {
         return nextProps.show !== this.props.show || nextProps.children !== this.props.children;
     }
+    
     render() {
         return (
             <Aux>

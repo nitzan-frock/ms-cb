@@ -9,13 +9,13 @@ const field = (props) => {
     }
     return (
         <input 
-                className={styleClass.join(" ")}
-                type="text" 
-                value={props.value} 
-                onChange={props.changed}
-                onBlur={props.unfocus}
-                maxLength= {props.maxLength}
-                placeholder={props.placeholder}></input>
+            className={styleClass.join(" ")}
+            type="text" 
+            value={props.value} 
+            onChange={props.changed}
+            onBlur={props.unfocus}
+            maxLength= {props.maxLength}
+            placeholder={props.placeholder}></input>
     );
 };
 

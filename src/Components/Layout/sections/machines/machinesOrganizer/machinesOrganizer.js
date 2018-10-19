@@ -58,7 +58,6 @@ export default class MachinesOrganizer extends Component {
 
     onLocationSelectionChanged = async event => {
         event.preventDefault();
-        console.log(event.target.value);
         const currentLocation = this.getItemFromListByName(this.state.locations, event.target.value);
         this.enterLocation(currentLocation);
     }
@@ -104,7 +103,6 @@ export default class MachinesOrganizer extends Component {
     enterLocation = async (location, toShow) => {
         if (toShow === DATAHUB_CARDS || this.state.childOfLocation === DATAHUB_CARDS) {
             const datahubs = await DataTools.getDatahubs({location_id: location.id});
-            console.log(datahubs);
             this.setState({
                 datahubs,
                 showCardType: DATAHUB_CARDS,

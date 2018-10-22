@@ -12,8 +12,8 @@ const field = (props) => {
             className={styleClass.join(" ")}
             type="text" 
             value={props.value} 
-            onChange={props.changed}
-            onBlur={props.unfocus}
+            onChange={props.formatInput}
+            onBlur={props.formatInput}
             maxLength= {props.maxLength}
             placeholder={props.placeholder}></input>
     );

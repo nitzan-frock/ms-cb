@@ -41,42 +41,11 @@ export default class newItemForm extends Component{
         }
     }
 
-    // formatInput = (event, field) => {
-    //     console.log(event.type);
-    //     console.log(field);
-    //     event.preventDefault();
-    //     const fields = this.state.fields;
-    //     const formatter = field.options.formatter;
-    //     console.log(formatter);
-    //     const formatOn = field.options.formatOn;
-    //     if (event.type === formatOn) {
-    //         fields[field.name].value = formatter(event.target.value);
-    //     } else if (event.type === formatOn) {
-    //         fields[field.name].value = formatter(event.target.value);
-    //     } else {
-    //         fields[field.name].value = event.target.value;
-    //     }
-    //     this.setState({fields});
-    // }
-
-    onFieldChanged = (event, field) => {
+    formatInput = (event, field) => {
         event.preventDefault();
         const fields = this.state.fields;
         const formatter = field.options.formatter;
-        if (field.options.formatOn === 'change') {
-            fields[field.name].value = formatter(event.target.value);
-        } else {
-            fields[field.name].value = event.target.value;
-        }
-        this.setState({fields});
-    }
-
-    onFieldUnfocus = (event, field) => {
-        event.preventDefault();
-        const fields = this.state.fields;
-        const formatter = field.options.formatter;
-        console.log(formatter('pa1712345'));
-        if (field.options.formatOn === 'blur') {
+        if (field.options.formatOn === event.type) {
             fields[field.name].value = formatter(event.target.value);
         } else {
             fields[field.name].value = event.target.value;
@@ -106,8 +75,7 @@ export default class newItemForm extends Component{
                         invalidEntry={this.props.invalidEntry}
                         value={this.state.fields[field.name].value}
                         options={field.options}
-                        changed={(e) => this.onFieldChanged(e, field)}
-                        unfocus={(e) => this.onFieldUnfocus(e, field)} />
+                        formatInput={(e) => this.formatInput(e, field)} />
                 );
             })
         }

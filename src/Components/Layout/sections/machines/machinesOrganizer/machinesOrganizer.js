@@ -166,7 +166,6 @@ export default class MachinesOrganizer extends Component {
 
         try {
             const response = await DataTools.addLocation(locationName, description, company_id);
-            console.log(response);
             if (!response.ok){
                 throw response;
             }
@@ -250,21 +249,43 @@ export default class MachinesOrganizer extends Component {
                     <span>Zones</span>
                 );
             } else if (this.state.childOfLocation === DATAHUB) {
+                const newDatahubFields = [
+                    {
+                        name: "name",
+                        type: "select",
+                        items: this.state.datahubs.map(datahub => {displayName: datahub.serial}),
+                        defaultValue: "Select a Datahub"
+                    }
+                ];
                 childSelection = (
                     <div>
                         <span>Datahubs</span>
-                        <Button clicked={this.showModal}>Add Location</Button>
+                        <Button clicked={this.showModal}>Add Datahub</Button>
+                        {
+                        this.state.showModal 
+                            ? (<Modal
+                                show={this.state.showModal}
+                                modalClosed={this.showModal} >
+                                <Form
+                                    fields={newDatahubFields}
+                                    reset={this.state.showModal}
+                                    submitForm={this.submitLocation} />
+                            </Modal>)
+                            : null
+                        }
                     </div>
                 );
             }
         } else {
             const newLocationFields = [
                 {
+                    type: "input",
                     name: "name",
                     maxLength: 20,
                     placeholder: "Location Name"
                 },
                 {
+                    type: "input",
                     name: "description",
                     maxLength: 50,
                     placeholder: "Description"

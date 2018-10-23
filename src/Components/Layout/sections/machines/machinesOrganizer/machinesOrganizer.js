@@ -8,6 +8,7 @@ import DatahubCards from './cards/datahubCards/datahubCards';
 import MachineCards from './cards/machineCards/machineCards';
 import Modal from '../../../../UI/modal/modal';
 import Button from '../../../../UI/button/button';
+import Form from '../../../../UI/form/form';
 
 import './machinesOrganizer.scss';
 
@@ -31,17 +32,6 @@ export default class MachinesOrganizer extends Component {
             currentZone: undefined,
             currentDatahub: undefined,
             showModal: false,
-            newLocation: {
-                displayName: "",
-                description: ""
-            },
-            newZone: {
-                displayName: "",
-                description: ""
-            },
-            newDatahub: {
-                displayName: ""
-            }
         };
     }
 
@@ -68,6 +58,10 @@ export default class MachinesOrganizer extends Component {
             zones,
             datahubs
         });
+    }
+
+    async componentDidUpdate(prevProps, prevState) {
+        
     }
 
     onLocationSelectionChanged = async event => {
@@ -165,15 +159,27 @@ export default class MachinesOrganizer extends Component {
         this.setState({ showModal: !prevState.showModal });
     }
 
-    onLocationInputChanged = () => {
+    submitLocation = async (values) => {
+        const company_id = this.props.activeCompany.id;
+        const locationName = values.name;
+        const description = values.description;
 
+        try {
+            const response = await DataTools.addLocation(locationName, description, company_id);
+            console.log(response);
+            if (!response.ok){
+                throw response;
+            }
+            const locations = await DataTools.getLocations({company_id});
+            this.setState({locations})
+            return response;
+        }
+        catch (err) {
+            return err;
+        }
     }
 
-    addLocation = async () => {
-
-    }
-
-    addZone = async () => {
+    submitZone = async () => {
 
     }
 
@@ -245,19 +251,41 @@ export default class MachinesOrganizer extends Component {
                 );
             } else if (this.state.childOfLocation === DATAHUB) {
                 childSelection = (
-                    <span>Datahubs</span>
+                    <div>
+                        <span>Datahubs</span>
+                        <Button clicked={this.showModal}>Add Location</Button>
+                    </div>
                 );
             }
         } else {
+            const newLocationFields = [
+                {
+                    name: "name",
+                    maxLength: 20,
+                    placeholder: "Location Name"
+                },
+                {
+                    name: "description",
+                    maxLength: 50,
+                    placeholder: "Description"
+                }
+            ];
             locationSelection = (
                 <div>
                     <span>Locations</span>
                     <Button clicked={this.showModal}>Add Location</Button>
-                    <Modal
-                        show={this.state.showModal}
-                        modalClosed={this.showModal} >
-                        <input value={this.state.newLocation} onChange={this.onLocationInputChanged}/>
-                    </Modal>
+                    {
+                        this.state.showModal 
+                            ? (<Modal
+                                show={this.state.showModal}
+                                modalClosed={this.showModal} >
+                                <Form
+                                    fields={newLocationFields}
+                                    reset={this.state.showModal}
+                                    submitForm={this.submitLocation} />
+                            </Modal>)
+                            : null
+                    }
                 </div>
             );
         }

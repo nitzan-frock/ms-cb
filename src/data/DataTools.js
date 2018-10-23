@@ -70,6 +70,20 @@ export default class DataTools {
         return await this._getData(url);
     }
 
+    static async addLocation(name, description, company_id) {
+        let url = `http://localhost:8080/locations`;
+        const location = {
+            displayName: name,
+            description,
+            companyId: company_id,
+            dataType: "location",
+            datahubCount: 0,
+            zoneCount: 0
+        }
+        await this._postData(url, location);
+        return {ok: true};
+    }
+
     static async getZones({location_id}) {
         const url = `http://localhost:8080/zones?&locationId=${location_id}`;
         return await this._getData(url);
@@ -110,14 +124,15 @@ export default class DataTools {
         })).json();
     }
 
-    static async addItemToCompanyInventory(item, company_id) {
+    static async addItemToCompanyInventory({serial, mac}, company_id) {
         const inventory = await this.getAvailableInventory();
-        const isValid = this._isItemValid(item, inventory);
+        const isValid = this._isItemValid({serial, mac}, inventory);
         if (isValid){
-            if (item.isDatahub()) {
+            const isDatahub = serial.match(/dhb/i);
+            if (isDatahub) {
                 const datahub = {
-                    serial: item.getSerial(),
-                    mac: item.getMAC(),
+                    serial: serial,
+                    mac: mac,
                     companyId: company_id,
                     locationId: null,
                     machines: []
@@ -125,8 +140,8 @@ export default class DataTools {
                 await DataTools._addDatahub(datahub, company_id, inventory);
             } else {
                 const sensor = {
-                    serial: item.getSerial(),
-                    mac: item.getMAC(),
+                    serial: serial,
+                    mac: mac,
                     companyId: company_id,
                     locationId: null,
                     zoneId: null,
@@ -134,10 +149,10 @@ export default class DataTools {
                 }
                 await DataTools._addSensor(sensor, company_id, inventory);
             }
-            return {ok: true, msg: "success"};
+            return {ok: true, body: "success"};
         } else {
-            const err = this._resolveInvalidEntry(item, inventory);
-            return {ok: false, msg: err};
+            const failedProperty = this._resolveInvalidField({serial, mac}, inventory);
+            return {ok: false, body: failedProperty};
         }
     }
 
@@ -149,7 +164,6 @@ export default class DataTools {
 
     static async _addDatahub(datahub, company_id, inventory) {
         const postUrl = `http://localhost:8080/datahubs`;
-        console.log(datahub);
         await this._postData(postUrl, datahub);
         await this._updateInventory(inventory, datahub, company_id);
     }
@@ -179,34 +193,59 @@ export default class DataTools {
         await this._putData((putUrl + putItem.id), putItem);
     }
 
-    static _isItemValid(target, inventory) {
+    static _isItemValid({serial, mac}, inventory) {
         return inventory.some(item => {
             return item.companyId === null && 
-                item.serial === target.getSerial() && 
-                item.mac === target.getMAC();
+                item.serial === serial && 
+                item.mac === mac;
         });
     }
 
-    static _resolveInvalidEntry(target, inventory) {
-        if (target.getSerial() === "" || target.getMAC() === "") return "invalid";
+    static _resolveInvalidField(fields = {}, inventory) {
+        const invalidFields = [];
+        let message = "";
 
-        const validSerial = inventory.some(item => {
-            if (item.serial !== target.getSerial()) return false;
-            return true;
+        Object.keys(fields).forEach(field => {
+            if (fields[field] === "") invalidFields.push(field);
+
+            inventory.forEach(item => {
+                if (message) return;
+                if (item.companyId && item[field] === fields[field]) {
+                    invalidFields.push("all");
+                    message = "This item is already assigned to a company.";
+                    return;
+                }
+            });
+            if (message) return;
+
+            const validField = inventory.some(item => {
+                item[field] === fields[field] ? true : false;    
+            });
+            
+            if (!validField) invalidFields.push(field);
         });
 
-        const validMAC = inventory.some(item => {
-            if (validSerial && item.mac !== target.getMAC()) return false;
-            return true;
-        });
+        return {invalidFields, message};
 
-        const unavailable = inventory.some(item => {
-            if (validSerial && validMAC && !item.companyId) return false;
-            return true;
-        });
+        // if (target.getSerial() === "" || target.getMAC() === "") return "invalid";
+
+        // const validSerial = inventory.some(item => {
+        //     if (item.serial !== target.getSerial()) return false;
+        //     return true;
+        // });
+
+        // const validMAC = inventory.some(item => {
+        //     if (validSerial && item.mac !== target.getMAC()) return false;
+        //     return true;
+        // });
+
+        // const unavailable = inventory.some(item => {
+        //     if (validSerial && validMAC && !item.companyId) return false;
+        //     return true;
+        // });
         
-        if (!validSerial) return "serial";
-        if (!validMAC) return "mac";
-        if (unavailable) return "invalid";
+        // if (!validSerial) return "serial";
+        // if (!validMAC) return "mac";
+        // if (unavailable) return "invalid";
     }   
 }

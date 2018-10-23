@@ -13,8 +13,6 @@ export default class ItemInventory extends Component {
         super(props);
         this.state = {
             showModal: false,
-            newItemSN: "",
-            newItemMAC: "",
             invalidEntry: "",
             shouldListUpdate: false
         }
@@ -24,30 +22,28 @@ export default class ItemInventory extends Component {
         const showModal = this.state.showModal;
         this.setState({
             showModal: !showModal, 
-            newItemSN: "",
-            newItemMAC: "",
             invalidEntry: ""
         });
     }
 
-    addNewItemHandler = async (values) => {
+    addNewItemHandler = async (itemValues) => {
         // add item on enter key press
         const company_id = this.props.activeCompany.id;
-        const serial = values.serial;
-        const mac = values.mac.replace(/[^a-z0-9]/ig, "");
+        const serial = itemValues.serial;
+        const mac = itemValues.mac.replace(/[^a-z0-9]/ig, "");
 
         try {
             const item = ItemCreator.create(serial, mac);
             const response = await DataTools.addItemToCompanyInventory(item, company_id);
 
             if (!response.ok){
-                throw response.msg;
+                throw response;
             }
             this.setShouldListUpdate();
-            this.setState({invalidEntry: ""})
+            return response;
         }
         catch (err) {
-            this.setState({invalidEntry: err});
+            return err;
         }
     }
 
@@ -56,29 +52,14 @@ export default class ItemInventory extends Component {
         this.setState({shouldListUpdate: !prevState.shouldListUpdate});
     }
 
-    newItemSNChangedHandler = (event) => {
-        this.setState({newItemSN: event.target.value});
-    }
-
-    newItemSNEnteredHandler = (str) => {
-        const serial = StringManipulator.serialNumberFormatter(str);
-        console.log(serial);
-        return serial;
-    }
-
-    newItemMACChangedHandler = (str) => {
-        const mac = StringManipulator.MACAddressFormatter(str);
-        return mac;
-    }
-
     render() {
-        const formFields =[
+        const formFields = [
             {
                 name: "serial",
                 maxLength: 13,
                 placeholder: "Serial Number",
                 options: {
-                    formatter: this.newItemSNEnteredHandler,
+                    formatter: StringManipulator.serialNumberFormatter,
                     formatOn: 'blur'
                 }
             },
@@ -87,8 +68,7 @@ export default class ItemInventory extends Component {
                 maxLength: 17,
                 placeholder: "MAC Address",
                 options: {
-                    formatter: this.newItemMACChangedHandler,
-                    formatOn: 'change'
+                    formatter: StringManipulator.MACAddressFormatter
                 }
             }
         ];

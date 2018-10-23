@@ -128,6 +128,13 @@
       "serial": "dhb-18-b01234",
       "mac": "b827eb012345",
       "companyId": 2
+    },
+    {
+      "dataType": "sensor",
+      "id": 14,
+      "serial": "vpa-18-b01234",
+      "mac": "0014cdeffe3c",
+      "companyId": 2
     }
   ],
   "companies": [
@@ -182,6 +189,42 @@
       "displayName": "building 4",
       "datahubCount": 0,
       "zoneCount": 0
+    },
+    {
+      "displayName": "test",
+      "description": "test",
+      "companyId": 2,
+      "dataType": "location",
+      "datahubCount": 0,
+      "zoneCount": 0,
+      "id": 6
+    },
+    {
+      "displayName": "derp",
+      "description": "",
+      "companyId": 2,
+      "dataType": "location",
+      "datahubCount": 0,
+      "zoneCount": 0,
+      "id": 7
+    },
+    {
+      "displayName": "1234",
+      "description": "",
+      "companyId": 2,
+      "dataType": "location",
+      "datahubCount": 0,
+      "zoneCount": 0,
+      "id": 8
+    },
+    {
+      "displayName": "dsadsa",
+      "description": "dsadas",
+      "companyId": 2,
+      "dataType": "location",
+      "datahubCount": 0,
+      "zoneCount": 0,
+      "id": 9
     }
   ],
   "zones": [
@@ -617,6 +660,15 @@
       "locationId": 3,
       "zoneId": 4,
       "machineId": 3
+    },
+    {
+      "serial": "vpa-18-b01234",
+      "mac": "0014cdeffe3c",
+      "companyId": 2,
+      "locationId": null,
+      "zoneId": null,
+      "machineId": null,
+      "id": 8
     }
   ]
 }

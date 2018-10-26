@@ -110,7 +110,11 @@ export default class MachinesOrganizer extends Component {
 
     enterLocation = async (location, toShow) => {
         if (toShow === DATAHUB || this.state.childOfLocation === DATAHUB) {
-            const datahubs = await DataTools.getDatahubs({ location_id: location.id });
+            const datahubs = (await DataTools.getDatahubs({ company_id: this.props.activeCompany.id }))
+                .map(datahub => {
+                    datahub.displayName = datahub.displayName ? datahub.displayName : datahub.serial;
+                    return datahub;
+                });
             this.setState({
                 datahubs,
                 showCardType: DATAHUB,
@@ -159,10 +163,10 @@ export default class MachinesOrganizer extends Component {
         this.setState({ showModal: !prevState.showModal });
     }
 
-    submitLocation = async (values) => {
+    addLocationToCompany = async (location) => {
         const company_id = this.props.activeCompany.id;
-        const locationName = values.name;
-        const description = values.description;
+        const locationName = location.name;
+        const description = location.description;
 
         try {
             const response = await DataTools.addLocation(locationName, description, company_id);
@@ -186,8 +190,33 @@ export default class MachinesOrganizer extends Component {
 
     }
 
-    addDatahub = async () => {
+    addDatahubToLocation = async (formValues) => {
+        const company_id = this.props.activeCompany.id;
 
+        const datahub = this.state.datahubs.filter(datahub => {
+            return Object.keys(formValues)
+                .map(key => datahub[key] === formValues[key] ? datahub : null)
+                .reduce((prev, curr) => prev ? prev : curr);
+        })[0];
+        console.log(`datahub:`);
+        console.log(datahub);
+        try {
+            console.log(this.state.currentLocation);
+            const response = await DataTools.updateDatahub(datahub, { 
+                location: this.state.currentLocation
+            });
+            if (!response.ok){
+                throw response;
+            }
+            await DataTools.updateLocation(this.state.currentLocation, true, false);
+            const datahubs = await DataTools.getDatahubs({company_id});
+            //console.log(datahubs);
+            this.setState({datahubs});
+            return response;
+        }
+        catch (err) {
+            return err;
+        }
     }
 
     render() {
@@ -196,51 +225,46 @@ export default class MachinesOrganizer extends Component {
 
         const locationSelectionItems = this.state.locations;
         const zoneSelectionItems = this.state.zones;
-        const datahubSelectionItems = this.state.datahubs.map(datahub => {
-            datahub.displayName = datahub.displayName ? datahub.displayName : datahub.serial
-            return datahub;
-        });
+        
 
         if (this.state.currentLocation) {
             locationSelection = (
                 <div>
                     <a href="#" onClick={this.showLocations}>Locations</a><span>&raquo;</span>
                     <Selection
-                        selectedItem={this.state.currentLocation.displayName}
-                        onSelectionChanged={this.onLocationSelectionChanged}
+                        value={this.state.currentLocation.displayName}
+                        changed={this.onLocationSelectionChanged}
                         items={locationSelectionItems} />
                 </div>
             );
             if (this.state.currentZone) {
                 console.log(`showing zones selection`);
-                const selectedZone = this.state.currentZone
-                    ? this.state.currentZone.displayName
-                    : this.state.zones[0].displayName;
+                console.log(this.state.currentZone.displayName);
+                const selectedZone = this.state.currentZone.displayName;
 
                 childSelection = (
                     <div>
                         <a href="#" onClick={() => this.showZones(this.state.currentLocation)}>Zones</a><span>&raquo;</span>
                         <Selection
-                            selectedItem={selectedZone}
-                            onSelectionChanged={this.onZoneSelectionChanged}
+                            value={selectedZone}
+                            changed={this.onZoneSelectionChanged}
                             items={zoneSelectionItems} />
                     </div>
                 );
             } else if (this.state.currentDatahub) {
-                const selectedDatahub = this.state.currentDatahub
-                    ? this.state.currentDatahub.displayName
-                        ? this.state.currentDatahub.displayName
-                        : this.state.currentDatahub.mac
-                    : this.state.datahubs[0].displayName
-                        ? this.state.datahubs[0].displayName
-                        : this.state.datahubs[0].mac;
+                const datahubSelectionItems = this.state.datahubs.filter(datahub => {
+                    if (datahub.locationId === this.state.currentLocation.id) {
+                        return datahub;
+                    }
+                });
+                const selectedDatahub = this.state.currentDatahub.displayName;
 
                 childSelection = (
                     <div>
                         <a href="#" onClick={() => this.showDatahubs(this.state.currentLocation)}>Datahubs&raquo;</a>
                         <Selection
-                            selectedItem={selectedDatahub}
-                            onSelectionChanged={this.onDatahubSelectionChanged}
+                            value={selectedDatahub}
+                            changed={this.onDatahubSelectionChanged}
                             items={datahubSelectionItems} />
                     </div>
                 );
@@ -249,11 +273,17 @@ export default class MachinesOrganizer extends Component {
                     <span>Zones</span>
                 );
             } else if (this.state.childOfLocation === DATAHUB) {
+                const datahubs = this.state.datahubs.filter(datahub => {
+                    if (!datahub.locationId) {
+                        return {value: datahub.serial, displayName: datahub.displayName};
+                    }
+                });
+
                 const newDatahubFields = [
                     {
-                        name: "name",
+                        name: "serial",
                         type: "select",
-                        items: this.state.datahubs.map(datahub => {displayName: datahub.serial}),
+                        items: datahubs,
                         defaultValue: "Select a Datahub"
                     }
                 ];
@@ -269,7 +299,7 @@ export default class MachinesOrganizer extends Component {
                                 <Form
                                     fields={newDatahubFields}
                                     reset={this.state.showModal}
-                                    submitForm={this.submitLocation} />
+                                    submitForm={this.addDatahubToLocation} />
                             </Modal>)
                             : null
                         }
@@ -303,7 +333,7 @@ export default class MachinesOrganizer extends Component {
                                 <Form
                                     fields={newLocationFields}
                                     reset={this.state.showModal}
-                                    submitForm={this.submitLocation} />
+                                    submitForm={this.addLocationToCompany} />
                             </Modal>)
                             : null
                     }
@@ -323,7 +353,15 @@ export default class MachinesOrganizer extends Component {
         } else if (this.state.showCardType === MACHINE_CARDS) {
             cards = <MachineCards machines={this.state.machines} editMachine={this.editMachine} />
         } else if (this.state.showCardType === DATAHUB) {
-            cards = <DatahubCards datahubs={this.state.datahubs} enterDatahub={this.enterDatahub} />
+            cards = (
+                <DatahubCards 
+                    datahubs={
+                        this.state.datahubs.filter(datahub => {
+                            return datahub.locationId === this.state.currentLocation.id ? datahub : null
+                        }) 
+                    }
+                    enterDatahub={this.enterDatahub} />
+            )
         }
 
         return this.state.loading

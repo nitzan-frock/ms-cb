@@ -25,7 +25,7 @@ export default class DataTools {
             const sensor = sensors[i];
             const location_id = sensor.locationId;
             const machine_id = sensor.machineId;
-            sensor.location = (await this.getLocations({location_id}))[0].displayName
+            sensor.location = location_id ? (await this.getLocations({location_id}))[0].displayName : null;
 
             if (machine_id) {
                 sensor.machines = await this.getMachines({machine_id});
@@ -109,7 +109,7 @@ export default class DataTools {
             method: 'POST',
             body: JSON.stringify(data),
             headers: {
-                "Content-type": "application/json; charset=UTF-8"
+                "Content-Type": "application/json; charset=UTF-8"
             }
         })).json();
     }
@@ -119,7 +119,17 @@ export default class DataTools {
             method: 'PUT',
             body: JSON.stringify(data),
             headers: {
-                "Content-type": "application/json; charset=UTF-8"
+                "Content-Type": "application/json; charset=UTF-8"
+            }
+        })).json();
+    }
+
+    static async _patchData(url, data){
+        return await (await fetch(url, {
+            method: 'PATCH',
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8"
             }
         })).json();
     }
@@ -168,29 +178,46 @@ export default class DataTools {
         await this._updateInventory(inventory, datahub, company_id);
     }
 
-    static async _updateLocation(location_id, addDatahub, addZone) {
+    static async updateLocation(location, addDatahub, addZone) {
         console.log(`update location`);
-        const putUrl = `http://localhost:8000/locations?id=${location_id}`;
-        const location = (await this._getData(putUrl))[0];
-        console.log(location);
+        console.log(`location id: ${location.id}`);
+        const url = `http://localhost:8080/locations/`;
         if (addDatahub) {
-            location.datahubCount = location.datahubCount ? location.datahubCount++ : 1;
+            location.datahubCount = location.datahubCount ? location.datahubCount+1 : 1;
         }
         if (addZone) {
-            location.zoneCount = location.zoneCount ? location.zoneCount++ : 1;
+            location.zoneCount = location.zoneCount ? location.zoneCount+1 : 1;
         }
-        await this._putData(purUrl, location);
+        console.log(location);
+        await this._putData((url+location.id), location);
+    }
+
+    static async updateDatahub(datahub, {location, machine, displayName}) {
+        const url = `http://localhost:8080/datahubs/`;
+        //const datahub = (await this._getData(url))[0];
+        if (location) {
+            datahub.locationId = location.id;
+            datahub.location = location.displayName;
+        }
+        datahub.machines = machine ? datahub.machines.push(machine) : datahub.machines;
+        datahub.displayName = displayName ? displayName : datahub.displayName;
+        console.log(datahub);
+        console.log(`from db: `);
+        console.log(await this._getData(url));
+        await this._putData((url+datahub.id), datahub);
+
+        return {ok: true, body: "success"};
     }
 
     static async _updateInventory(inventory, item, company_id) {
-        const putUrl = `http://localhost:8080/itemInventory/`;
+        const url = `http://localhost:8080/itemInventory/`;
         const putItem = inventory.filter(unit => {
             if (unit.serial === item.serial && unit.mac === item.mac) {
                 unit.companyId = company_id;
                 return unit;
             }
         })[0];
-        await this._putData((putUrl + putItem.id), putItem);
+        await this._putData((url + putItem.id), putItem);
     }
 
     static _isItemValid({serial, mac}, inventory) {
@@ -226,26 +253,5 @@ export default class DataTools {
         });
 
         return {invalidFields, message};
-
-        // if (target.getSerial() === "" || target.getMAC() === "") return "invalid";
-
-        // const validSerial = inventory.some(item => {
-        //     if (item.serial !== target.getSerial()) return false;
-        //     return true;
-        // });
-
-        // const validMAC = inventory.some(item => {
-        //     if (validSerial && item.mac !== target.getMAC()) return false;
-        //     return true;
-        // });
-
-        // const unavailable = inventory.some(item => {
-        //     if (validSerial && validMAC && !item.companyId) return false;
-        //     return true;
-        // });
-        
-        // if (!validSerial) return "serial";
-        // if (!validMAC) return "mac";
-        // if (unavailable) return "invalid";
     }   
 }

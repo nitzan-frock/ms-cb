@@ -24,25 +24,30 @@ export default class Form extends Component{
 
             if (field.options) {
                 formatter = field.options.formatter;
-                formatOn = field.options.formatOn;
+                formatOn = field.options.formatOn ? field.options.formatOn : formatOn;
             }
 
             fields[field.name] = {
                 value: "",
                 formatter,
                 formatOn,
-                invalidEntry: false
+                invalidEntry: false,
+                type: field.type
             }
         });
         this.setState({fields});
     }
 
     componentDidUpdate() {
+        //console.log(`[componentDidUpdate]`);
         if (this.props.reset !== this.state.shouldReset) {
             this.setState(prevState => {
                 const fields = prevState.fields;
                 Object.keys(fields).forEach(field => {
-                    fields[field].value = "";
+                    if (fields[field].type !== "select") {
+                        console.log(fields[field].type);
+                        fields[field].value = "";
+                    }
                 });
 
                 const shouldReset = !prevState.shouldReset;
@@ -52,7 +57,7 @@ export default class Form extends Component{
         }
     }
 
-    formatInput = (event, fieldName) => {
+    fieldChanged = (event, fieldName) => {
         event.preventDefault();
         const fields = this.state.fields;
         const formatter = fields[fieldName].formatter;
@@ -65,6 +70,12 @@ export default class Form extends Component{
         this.setState({fields});
     }
 
+    onSelectionChanged = (event, selection) => {
+        event.preventDefault();
+        const fields = this.state.fields;
+
+    }
+
     submitForm = async () => {
         let submitValues = {};
         const fields = this.state.fields;
@@ -74,7 +85,6 @@ export default class Form extends Component{
         });
 
         const response = await this.props.submitForm(submitValues);
-        console.log(response);
 
         if (!response.ok) {
             response.body.invalidFields.forEach(field => {
@@ -86,10 +96,8 @@ export default class Form extends Component{
                     fields[field].invalidEntry = true;
                 }
             });
-            console.log(fields);
             this.setState({fields, message: response.body.message});
         } else {
-            console.log(this.props.reset, this.state.shouldReset);
             this.setState({shouldReset: !this.props.reset})
         }
     }
@@ -101,13 +109,10 @@ export default class Form extends Component{
                 return (
                     <Field
                         key={index}
-                        name={field.name}
-                        maxLength={field.maxLength}
-                        placeholder={field.placeholder}
+                        field={field}
                         invalidEntry={this.state.fields[field.name].invalidEntry}
                         value={this.state.fields[field.name].value}
-                        options={field.options}
-                        formatInput={(e) => this.formatInput(e, field.name)} />
+                        changed={(e) => this.fieldChanged(e, field.name)} />
                 );
             })
         }

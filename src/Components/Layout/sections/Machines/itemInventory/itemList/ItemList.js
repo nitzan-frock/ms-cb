@@ -74,13 +74,12 @@ export default class ItemList extends Component {
                     headers={tableHeaders} />
             );
         }
-
         return (
             <>
                 <Selection
                     defaultValue={defaultSelectionValue}
-                    selectedItem={this.state.selectedItem}
-                    onSelectionChanged={this.onSelectionChanged}
+                    value={this.state.selectedItem}
+                    changed={this.onSelectionChanged}
                     items={itemSelections} />
                 {
                     this.state.selectedItem === undefined

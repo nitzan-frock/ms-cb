@@ -191,40 +191,13 @@
       "zoneCount": 0
     },
     {
-      "displayName": "test",
-      "description": "test",
+      "displayName": "blep",
+      "description": "",
       "companyId": 2,
       "dataType": "location",
-      "datahubCount": 0,
+      "datahubCount": 2,
       "zoneCount": 0,
       "id": 6
-    },
-    {
-      "displayName": "derp",
-      "description": "",
-      "companyId": 2,
-      "dataType": "location",
-      "datahubCount": 0,
-      "zoneCount": 0,
-      "id": 7
-    },
-    {
-      "displayName": "1234",
-      "description": "",
-      "companyId": 2,
-      "dataType": "location",
-      "datahubCount": 0,
-      "zoneCount": 0,
-      "id": 8
-    },
-    {
-      "displayName": "dsadsa",
-      "description": "dsadas",
-      "companyId": 2,
-      "dataType": "location",
-      "datahubCount": 0,
-      "zoneCount": 0,
-      "id": 9
     }
   ],
   "zones": [
@@ -330,9 +303,10 @@
       "serial": "dhb-17-b00032",
       "mac": "b827eb34019a",
       "companyId": 2,
-      "locationId": null,
+      "locationId": 6,
       "machines": [],
-      "displayName": ""
+      "displayName": "dhb-17-b00032",
+      "location": "blep"
     },
     {
       "dataType": "datahub",
@@ -344,10 +318,12 @@
       "machines": [
         {
           "zoneId": 2,
-          "machineId": 5
+          "machineId": 5,
+          "displayName": "machine 2"
         }
       ],
-      "displayName": ""
+      "displayName": "dhb-17-b00387",
+      "location": "building 1"
     },
     {
       "dataType": "datahub",
@@ -364,10 +340,11 @@
       "serial": "dhb-18-b12345",
       "mac": "b827eb567890",
       "companyId": 2,
-      "locationId": null,
+      "locationId": 6,
       "machines": [],
       "id": 5,
-      "displayName": ""
+      "displayName": "dhb-18-b12345",
+      "location": "blep"
     },
     {
       "dataType": "datahub",

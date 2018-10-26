@@ -55,6 +55,7 @@ export default class ItemInventory extends Component {
     render() {
         const formFields = [
             {
+                type: "input",
                 name: "serial",
                 maxLength: 13,
                 placeholder: "Serial Number",
@@ -64,6 +65,7 @@ export default class ItemInventory extends Component {
                 }
             },
             {
+                type: "input",
                 name: "mac",
                 maxLength: 17,
                 placeholder: "MAC Address",

@@ -163,7 +163,7 @@
       "id": 2,
       "companyId": 2,
       "displayName": "building 1",
-      "datahubCount": 1,
+      "datahubCount": 4,
       "zoneCount": 1
     },
     {
@@ -171,7 +171,7 @@
       "id": 3,
       "companyId": 2,
       "displayName": "building 2",
-      "datahubCount": 0,
+      "datahubCount": 3,
       "zoneCount": 2
     },
     {
@@ -179,7 +179,7 @@
       "id": 4,
       "companyId": 2,
       "displayName": "building 3",
-      "datahubCount": 0,
+      "datahubCount": 2,
       "zoneCount": 0
     },
     {
@@ -187,7 +187,7 @@
       "id": 5,
       "companyId": 2,
       "displayName": "building 4",
-      "datahubCount": 0,
+      "datahubCount": 2,
       "zoneCount": 0
     },
     {
@@ -351,110 +351,121 @@
       "serial": "dhb-18-b23456",
       "mac": "b827eb098765",
       "companyId": 2,
-      "locationId": null,
+      "locationId": 2,
       "machines": [],
       "id": 6,
-      "displayName": ""
+      "displayName": "dhb-18-b23456",
+      "location": "building 1"
     },
     {
       "dataType": "datahub",
       "serial": "dhb-18-b11111",
       "mac": "b827ebaabbcc",
       "companyId": 2,
-      "locationId": null,
+      "locationId": 3,
       "machines": [],
       "id": 7,
-      "displayName": ""
+      "displayName": "dhb-18-b11111",
+      "location": "building 2"
     },
     {
       "dataType": "datahub",
       "serial": "dhb-18-b22222",
       "mac": "b827ebaaaaaa",
       "companyId": 2,
-      "locationId": null,
+      "locationId": 5,
       "machines": [],
       "id": 8,
-      "displayName": ""
+      "displayName": "dhb-18-b22222",
+      "location": "building 4"
     },
     {
       "dataType": "datahub",
       "serial": "dhb-18-b33333",
       "mac": "b827ebbbbbbb",
       "companyId": 2,
-      "locationId": null,
+      "locationId": 3,
       "machines": [],
       "id": 9,
-      "displayName": ""
+      "displayName": "dhb-18-b33333",
+      "location": "building 2"
     },
     {
       "dataType": "datahub",
       "serial": "dhb-18-b44444",
       "mac": "b827ebcccccc",
       "companyId": 2,
-      "locationId": null,
+      "locationId": 2,
       "machines": [],
       "id": 10,
-      "displayName": ""
+      "displayName": "dhb-18-b44444",
+      "location": "building 1"
     },
     {
       "dataType": "datahub",
       "serial": "dhb-18-b55555",
       "mac": "b827ebdddddd",
       "companyId": 2,
-      "locationId": null,
+      "locationId": 4,
       "machines": [],
       "id": 11,
-      "displayName": ""
+      "displayName": "dhb-18-b55555",
+      "location": "building 3"
     },
     {
       "dataType": "datahub",
       "serial": "dhb-18-b66666",
       "mac": "b827ebeeeeee",
       "companyId": 2,
-      "locationId": null,
+      "locationId": 5,
       "machines": [],
       "id": 12,
-      "displayName": ""
+      "displayName": "dhb-18-b66666",
+      "location": "building 4"
     },
     {
       "dataType": "datahub",
       "serial": "dhb-18-b77777",
       "mac": "b827ebffffff",
       "companyId": 2,
-      "locationId": null,
+      "locationId": 3,
       "machines": [],
       "id": 13,
-      "displayName": ""
+      "displayName": "dhb-18-b77777",
+      "location": "building 2"
     },
     {
       "dataType": "datahub",
       "serial": "dhb-18-b88888",
       "mac": "b827eb654321",
       "companyId": 2,
-      "locationId": null,
+      "locationId": 4,
       "machines": [],
       "id": 14,
-      "displayName": ""
+      "displayName": "dhb-18-b88888",
+      "location": "building 3"
     },
     {
       "dataType": "datahub",
       "serial": "dhb-18-b99999",
       "mac": "b827eb246813",
       "companyId": 2,
-      "locationId": null,
+      "locationId": 2,
       "machines": [],
       "id": 15,
-      "displayName": ""
+      "displayName": "dhb-18-b99999",
+      "location": "building 1"
     },
     {
       "dataType": "datahub",
       "serial": "dhb-18-b01234",
       "mac": "b827eb012345",
       "companyId": 2,
-      "locationId": null,
+      "locationId": 2,
       "machines": [],
       "id": 16,
-      "displayName": ""
+      "displayName": "dhb-18-b01234",
+      "location": "building 1"
     }
   ],
   "sensors": [

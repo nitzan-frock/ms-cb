@@ -110,11 +110,7 @@ export default class MachinesOrganizer extends Component {
 
     enterLocation = async (location, toShow) => {
         if (toShow === DATAHUB || this.state.childOfLocation === DATAHUB) {
-            const datahubs = (await DataTools.getDatahubs({ company_id: this.props.activeCompany.id }))
-                .map(datahub => {
-                    datahub.displayName = datahub.displayName ? datahub.displayName : datahub.serial;
-                    return datahub;
-                });
+            const datahubs = (await DataTools.getDatahubs({ company_id: this.props.activeCompany.id }));
             this.setState({
                 datahubs,
                 showCardType: DATAHUB,
@@ -198,19 +194,16 @@ export default class MachinesOrganizer extends Component {
                 .map(key => datahub[key] === formValues[key] ? datahub : null)
                 .reduce((prev, curr) => prev ? prev : curr);
         })[0];
-        console.log(`datahub:`);
-        console.log(datahub);
+
         try {
-            console.log(this.state.currentLocation);
-            const response = await DataTools.updateDatahub(datahub, { 
+            const response = await DataTools.updateDatahub(datahub, 'add', { 
                 location: this.state.currentLocation
             });
             if (!response.ok){
                 throw response;
             }
-            await DataTools.updateLocation(this.state.currentLocation, true, false);
+            await DataTools.updateLocation(this.state.currentLocation, 'add', {datahub: true});
             const datahubs = await DataTools.getDatahubs({company_id});
-            //console.log(datahubs);
             this.setState({datahubs});
             return response;
         }
@@ -238,8 +231,6 @@ export default class MachinesOrganizer extends Component {
                 </div>
             );
             if (this.state.currentZone) {
-                console.log(`showing zones selection`);
-                console.log(this.state.currentZone.displayName);
                 const selectedZone = this.state.currentZone.displayName;
 
                 childSelection = (
@@ -273,12 +264,15 @@ export default class MachinesOrganizer extends Component {
                     <span>Zones</span>
                 );
             } else if (this.state.childOfLocation === DATAHUB) {
-                const datahubs = this.state.datahubs.filter(datahub => {
+                let datahubs = this.state.datahubs.filter(datahub => {
                     if (!datahub.locationId) {
-                        return {value: datahub.serial, displayName: datahub.displayName};
+                        return datahub;
                     }
+                }).map(datahub => { 
+                    const value = datahub.serial;
+                    const displayName = datahub.displayName ? datahub.displayName : value;
+                    return {value, displayName};
                 });
-
                 const newDatahubFields = [
                     {
                         name: "serial",

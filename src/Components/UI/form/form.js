@@ -44,12 +44,10 @@ export default class Form extends Component{
             this.setState(prevState => {
                 const fields = prevState.fields;
                 Object.keys(fields).forEach(field => {
-                    if (fields[field].type !== "select") {
                         console.log(fields[field].type);
                         fields[field].value = "";
-                    }
                 });
-
+                console.log(fields);
                 const shouldReset = !prevState.shouldReset;
 
                 return {fields, shouldReset};

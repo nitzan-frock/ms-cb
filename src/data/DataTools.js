@@ -70,20 +70,6 @@ export default class DataTools {
         return await this._getData(url);
     }
 
-    static async addLocation(name, description, company_id) {
-        let url = `http://localhost:8080/locations`;
-        const location = {
-            displayName: name,
-            description,
-            companyId: company_id,
-            dataType: "location",
-            datahubCount: 0,
-            zoneCount: 0
-        }
-        await this._postData(url, location);
-        return {ok: true};
-    }
-
     static async getZones({location_id}) {
         const url = `http://localhost:8080/zones?&locationId=${location_id}`;
         return await this._getData(url);
@@ -134,7 +120,11 @@ export default class DataTools {
         })).json();
     }
 
-    static async addItemToCompanyInventory({serial, mac}, company_id) {
+    /**
+     *  Functions to register items to Database
+    **/
+
+    static async registerItemToCompany({serial, mac}, company_id) {
         const inventory = await this.getAvailableInventory();
         const isValid = this._isItemValid({serial, mac}, inventory);
         if (isValid){
@@ -147,7 +137,7 @@ export default class DataTools {
                     locationId: null,
                     machines: []
                 }
-                await DataTools._addDatahub(datahub, company_id, inventory);
+                await DataTools._registerDatahub(datahub, company_id, inventory);
             } else {
                 const sensor = {
                     serial: serial,
@@ -157,7 +147,7 @@ export default class DataTools {
                     zoneId: null,
                     machineId: null
                 }
-                await DataTools._addSensor(sensor, company_id, inventory);
+                await DataTools._registerSensor(sensor, company_id, inventory);
             }
             return {ok: true, body: "success"};
         } else {
@@ -166,86 +156,16 @@ export default class DataTools {
         }
     }
 
-    static async _addSensor(sensor, company_id, inventory) {
+    static async _registerSensor(sensor, company_id, inventory) {
         const postUrl = `http://localhost:8080/sensors`;
         await this._postData(postUrl, sensor);
         await DataTools._updateInventory(inventory, sensor, company_id);
     }
 
-    static async _addDatahub(datahub, company_id, inventory) {
+    static async _registerDatahub(datahub, company_id, inventory) {
         const postUrl = `http://localhost:8080/datahubs`;
         await this._postData(postUrl, datahub);
         await this._updateInventory(inventory, datahub, company_id);
-    }
-
-    static async updateLocation(location, option, {datahub, zone}) {
-        const url = `http://localhost:8080/locations/`;
-
-        switch (option) {
-            case 'add':
-                if (datahub) {
-                    location.datahubCount = location.datahubCount+1;
-                }
-                if (zone) {
-                    location.zoneCount = location.zoneCount+1;
-                }
-                break;
-            case 'remove':
-                if (datahub) {
-                    location.datahubCount = location.datahubCount-1;
-                }
-                if (zone) {
-                    location.zoneCount = location.zoneCount-1;
-                }
-                break;
-            default:
-                throw 'Must provide an option: "add" or "remove"';
-                
-        }
-        let response = await this._putData((url+location.id), location);
-
-        if (Object.keys(response).length) {
-            return {ok: true, body: "success"};
-        }
-        return {ok: false, body: "failed to update location"}
-    }
-
-    static async updateDatahub(datahub, option, {location, machine, displayName}) {
-        const url = `http://localhost:8080/datahubs/`;
-
-        switch (option) {
-            case 'add':
-                if (location) {
-                    datahub.locationId = location.id;
-                    datahub.location = location.displayName;
-                }
-                if (machine) {
-                    datahub.machines.push(machine);
-                }
-                if (displayName) {
-                    datahub.displayName = displayName;
-                }
-                break;
-            case 'remove':
-                if (location) {
-                    datahub.locationId = null;
-                    datahub.location = null;
-                }
-                if (machine) {
-                    datahub.machines = datahub.machines.filter(machine => {
-                        if (machine.machineId !== machine.id) return machine;
-                    });
-                }
-                break;
-            default:
-                throw 'Must provide an option: "add" or "remove"';
-        }
-        const response = await this._putData((url+datahub.id), datahub);
-
-        if (Object.keys(response).length) {
-            return {ok: true, body: "success"};
-        }
-        return {ok: false, body: "failed to update location"}
     }
 
     static async _updateInventory(inventory, item, company_id) {
@@ -292,5 +212,118 @@ export default class DataTools {
         });
 
         return {invalidFields, message};
+    }
+
+    // Add new locations, zones, machines
+
+    static async addLocation(name, description, company_id) {
+        let url = `http://localhost:8080/locations`;
+        const location = {
+            displayName: name,
+            description,
+            companyId: company_id,
+            dataType: "location",
+            datahubCount: 0,
+            zoneCount: 0
+        }
+        await this._postData(url, location);
+        return {ok: true};
+    }
+
+    static async addZone(name, description, location) {
+        const url = `http://localhost:8080/zones`;
+        const zone = {
+            displayName: name,
+            description,
+            locationId: location.id,
+            dataType: "zone",
+            machineCount: 0
+        }
+        const response = await this._postData(url, zone);
+
+        if (Object.keys(response).length) {
+            await this.updateLocation(location, 'add', {zone: true})
+            return {ok: true, body: "success"};
+        }
+        return {ok: false, body: "Failed to add zone."}
+    }
+
+    /*
+     *  Update database records.
+     */
+
+    static async updateLocation(location, option, {datahub, zone}) {
+        const url = `http://localhost:8080/locations/`;
+
+        switch (option) {
+            case 'add':
+                if (datahub) {
+                    location.datahubCount = location.datahubCount+1;
+                }
+                if (zone) {
+                    location.zoneCount = location.zoneCount+1;
+                }
+                break;
+            case 'remove':
+                if (datahub) {
+                    location.datahubCount = location.datahubCount-1;
+                }
+                if (zone) {
+                    location.zoneCount = location.zoneCount-1;
+                }
+                break;
+            default:
+                throw 'Must provide an option: "add" or "remove"';
+                
+        }
+        let response = await this._putData((url+location.id), location);
+
+        if (Object.keys(response).length) {
+            return {ok: true, body: "success"};
+        }
+        return {ok: false, body: "Failed to update location."}
+    }
+
+    static async updateDatahub(datahub, option, {location, machine, displayName}) {
+        const url = `http://localhost:8080/datahubs/`;
+
+        switch (option) {
+            case 'add':
+                if (location) {
+                    datahub.locationId = location.id;
+                    datahub.location = location.displayName;
+                }
+                if (machine) {
+                    datahub.machines.push(machine);
+                }
+                if (displayName) {
+                    datahub.displayName = displayName;
+                }
+                break;
+            case 'remove':
+                if (location) {
+                    datahub.locationId = null;
+                    datahub.location = null;
+                }
+                if (machine) {
+                    datahub.machines = datahub.machines.filter(machine => {
+                        if (machine.machineId !== machine.id) return machine;
+                    });
+                }
+                break;
+            default:
+                throw 'Must provide an option: "add" or "remove"';
+        }
+        const response = await this._putData((url+datahub.id), datahub);
+
+        if (Object.keys(response).length) {
+            this.updateLocation(
+                location, 
+                'add', 
+                {datahub: true}
+            );
+            return {ok: true, body: "success"};
+        }
+        return {ok: false, body: "Failed to add datahub to location."}
     }   
 }

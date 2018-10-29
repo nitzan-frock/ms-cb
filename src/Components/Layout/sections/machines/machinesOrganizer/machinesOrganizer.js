@@ -159,13 +159,15 @@ export default class MachinesOrganizer extends Component {
         this.setState({ showModal: !prevState.showModal });
     }
 
-    addLocationToCompany = async (location) => {
+    addLocationToCompany = async (formValues) => {
         const company_id = this.props.activeCompany.id;
-        const locationName = location.name;
-        const description = location.description;
+        const location = {};
+        Object.keys(formValues).forEach(key => {
+            location[key] = formValues[key];
+        });
 
         try {
-            const response = await DataTools.addLocation(locationName, description, company_id);
+            const response = await DataTools.addLocation(location.name, location.description, company_id);
             if (!response.ok){
                 throw response;
             }
@@ -178,12 +180,25 @@ export default class MachinesOrganizer extends Component {
         }
     }
 
-    submitZone = async () => {
+    addZoneToLocation = async (formValues) => {
+        const location = this.state.currentLocation;
+        const zone = {};
+        Object.keys(formValues).forEach(key => {
+            zone[key] = formValues[key];
+        });
 
-    }
-
-    addMachine = async () => {
-
+        try {
+            const response = await DataTools.addZone(zone.name, zone.description, location);
+            if (!response.ok) {
+                throw response;
+            }
+            const zones = await DataTools.getZones({location_id: location.id});
+            this.setState({zones});
+            return response;
+        }
+        catch (err) {
+            return err;
+        }
     }
 
     addDatahubToLocation = async (formValues) => {
@@ -196,13 +211,15 @@ export default class MachinesOrganizer extends Component {
         })[0];
 
         try {
-            const response = await DataTools.updateDatahub(datahub, 'add', { 
-                location: this.state.currentLocation
-            });
+            const response = await DataTools.updateDatahub(
+                datahub, 
+                'add', 
+                {location: this.state.currentLocation}
+            );
             if (!response.ok){
                 throw response;
             }
-            await DataTools.updateLocation(this.state.currentLocation, 'add', {datahub: true});
+            
             const datahubs = await DataTools.getDatahubs({company_id});
             this.setState({datahubs});
             return response;
@@ -260,8 +277,33 @@ export default class MachinesOrganizer extends Component {
                     </div>
                 );
             } else if (this.state.childOfLocation === ZONE) {
+                const newZoneFields = [
+                    {
+                        type: "input",
+                        name: "name",
+                        maxLength: 20,
+                        placeholder: "Zone Name"
+                    },
+                    {
+                        type: "input",
+                        name: "description",
+                        maxLength: 50,
+                        placeholder: "Description"
+                    }
+                ];
                 childSelection = (
-                    <span>Zones</span>
+                    <div>
+                        <span>Zones</span>
+                        <Button clicked={this.showModal}>Add Zone</Button>
+                        <Modal
+                            show={this.state.showModal}
+                            modalClosed={this.showModal} >
+                            <Form 
+                                fields={newZoneFields}
+                                reset={this.state.showModal}
+                                submitForm={this.addZoneToLocation} />
+                        </Modal>
+                    </div>
                 );
             } else if (this.state.childOfLocation === DATAHUB) {
                 let datahubs = this.state.datahubs.filter(datahub => {
@@ -285,18 +327,14 @@ export default class MachinesOrganizer extends Component {
                     <div>
                         <span>Datahubs</span>
                         <Button clicked={this.showModal}>Add Datahub</Button>
-                        {
-                        this.state.showModal 
-                            ? (<Modal
-                                show={this.state.showModal}
-                                modalClosed={this.showModal} >
-                                <Form
-                                    fields={newDatahubFields}
-                                    reset={this.state.showModal}
-                                    submitForm={this.addDatahubToLocation} />
-                            </Modal>)
-                            : null
-                        }
+                        <Modal
+                            show={this.state.showModal}
+                            modalClosed={this.showModal} >
+                            <Form
+                                fields={newDatahubFields}
+                                reset={this.state.showModal}
+                                submitForm={this.addDatahubToLocation} />
+                        </Modal>
                     </div>
                 );
             }

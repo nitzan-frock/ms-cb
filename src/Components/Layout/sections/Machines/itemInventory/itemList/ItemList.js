@@ -51,8 +51,8 @@ export default class ItemList extends Component {
     render() {
         const itemSelections = [
             {value: DATAHUBS, displayName: 'Datahubs'}, 
-            {value: SENSORS, displayName: 'Sensors'}, 
-            {value: OEM, displayName:'OEM'}
+            {value: SENSORS, displayName: 'Analyzer Products'}, 
+            {value: OEM, displayName:'OEM Products'}
         ];
         const defaultSelectionValue = "Select A Product";
 

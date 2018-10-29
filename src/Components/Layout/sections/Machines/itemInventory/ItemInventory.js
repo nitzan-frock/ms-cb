@@ -34,7 +34,7 @@ export default class ItemInventory extends Component {
 
         try {
             const item = ItemCreator.create(serial, mac);
-            const response = await DataTools.addItemToCompanyInventory(item, company_id);
+            const response = await DataTools.registerItemToCompany(item, company_id);
 
             if (!response.ok){
                 throw response;

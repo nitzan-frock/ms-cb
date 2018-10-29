@@ -164,7 +164,7 @@
       "companyId": 2,
       "displayName": "building 1",
       "datahubCount": 4,
-      "zoneCount": 1
+      "zoneCount": 4
     },
     {
       "dataType": "location",
@@ -232,6 +232,30 @@
       "locationId": 3,
       "displayName": "zone 2",
       "machineCount": 1
+    },
+    {
+      "displayName": "zone 2",
+      "description": "test",
+      "locationId": 2,
+      "dataType": "zone",
+      "machineCount": 0,
+      "id": 5
+    },
+    {
+      "displayName": "test",
+      "description": "",
+      "locationId": 2,
+      "dataType": "zone",
+      "machineCount": 0,
+      "id": 6
+    },
+    {
+      "displayName": "tester",
+      "description": "",
+      "locationId": 2,
+      "dataType": "zone",
+      "machineCount": 0,
+      "id": 7
     }
   ],
   "machines": [

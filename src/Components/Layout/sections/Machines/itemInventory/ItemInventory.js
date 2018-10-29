@@ -79,7 +79,7 @@ export default class ItemInventory extends Component {
             <>
                 <Modal show={this.state.showModal} modalClosed={this.showModalHandler} >
                     <Form 
-                        fields={formFields}
+                        formFields={formFields}
                         reset={!this.state.showModal}
                         submitForm={this.addNewItemHandler}
                         invalidEntry={this.state.invalidEntry} />

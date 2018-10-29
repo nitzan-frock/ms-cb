@@ -26,12 +26,14 @@ export default class MachinesOrganizer extends Component {
             locations: [],
             zones: [],
             machines: [],
+            sensors: [],
             datahubs: [],
             showCardType: undefined,
             currentLocation: undefined,
             currentZone: undefined,
             currentDatahub: undefined,
             showModal: false,
+            modalType: null
         };
     }
 
@@ -39,15 +41,23 @@ export default class MachinesOrganizer extends Component {
         const company_id = this.props.activeCompany.id;
         const defaultLocation_id = this.props.activeUser.defaultLocationId;
         const locations = await DataTools.getLocations({ company_id });
+        const datahubs = await DataTools.getDatahubs({company_id});
+        const sensors = await DataTools.getSensors({company_id});
 
         if (!defaultLocation_id) {
-            this.setState({ loading: false, locations });
+            this.setState({
+                loading: false, 
+                locations,
+                datahubs,
+                sensors
+            });
             return;
         }
 
-        const location = (await DataTools.getLocations({ location_id: defaultLocation_id }))[0];
+        const location = locations.map(location => {
+            return location.id === defaultLocation_id ? location : null
+        }).reduce((prev, curr) => prev ? prev : curr);
         const zones = await DataTools.getZones({ location_id: location.id });
-        const datahubs = await DataTools.getDatahubs({ location_id: location.id });
 
         this.setState({
             loading: false,
@@ -56,7 +66,8 @@ export default class MachinesOrganizer extends Component {
             childOfLocation: null,
             locations,
             zones,
-            datahubs
+            datahubs,
+            sensors
         });
     }
 
@@ -154,9 +165,9 @@ export default class MachinesOrganizer extends Component {
         return await DataTools.getMachines({ zone_id, datahub_serial });
     }
 
-    showModal = () => {
+    showModal = (type) => {
         const prevState = { ...this.state };
-        this.setState({ showModal: !prevState.showModal });
+        this.setState({ showModal: !prevState.showModal, modalType: type });
     }
 
     addLocationToCompany = async (formValues) => {
@@ -229,6 +240,12 @@ export default class MachinesOrganizer extends Component {
         }
     }
 
+    // Onboard sensor to a machine
+    onboardSensor = async formValues => {
+
+    }
+
+
     render() {
         let locationSelection = null;
         let childSelection = null;
@@ -250,6 +267,7 @@ export default class MachinesOrganizer extends Component {
             if (this.state.currentZone) {
                 const selectedZone = this.state.currentZone.displayName;
 
+
                 childSelection = (
                     <div>
                         <a href="#" onClick={() => this.showZones(this.state.currentLocation)}>Zones</a><span>&raquo;</span>
@@ -257,6 +275,7 @@ export default class MachinesOrganizer extends Component {
                             value={selectedZone}
                             changed={this.onZoneSelectionChanged}
                             items={zoneSelectionItems} />
+                        <Button clicked={this.showModal}>Onboard Sensor</Button>
                     </div>
                 );
             } else if (this.state.currentDatahub) {
@@ -299,7 +318,7 @@ export default class MachinesOrganizer extends Component {
                             show={this.state.showModal}
                             modalClosed={this.showModal} >
                             <Form 
-                                fields={newZoneFields}
+                                formFields={newZoneFields}
                                 reset={this.state.showModal}
                                 submitForm={this.addZoneToLocation} />
                         </Modal>
@@ -331,7 +350,7 @@ export default class MachinesOrganizer extends Component {
                             show={this.state.showModal}
                             modalClosed={this.showModal} >
                             <Form
-                                fields={newDatahubFields}
+                                formFields={newDatahubFields}
                                 reset={this.state.showModal}
                                 submitForm={this.addDatahubToLocation} />
                         </Modal>
@@ -353,22 +372,49 @@ export default class MachinesOrganizer extends Component {
                     placeholder: "Description"
                 }
             ];
+
+            const sensors = this.state.sensors.map(sensor => {
+                return {value: sensor.serial, displayName: sensor.serial}
+            });
+
+            const onboardSensorFields = [
+                {
+                    type: "select",
+                    name: "sensor-serial",
+                    items: sensors
+                }
+            ];
+            // const onboardSensorFields = {
+            //     page: 1,
+            //     fields: [
+            //         {
+            //             type: "select",
+            //             name: "sensor-serial",
+            //             items: sensors
+            //         }
+            //     ]
+            // }
+
             locationSelection = (
                 <div>
                     <span>Locations</span>
-                    <Button clicked={this.showModal}>Add Location</Button>
-                    {
-                        this.state.showModal 
-                            ? (<Modal
-                                show={this.state.showModal}
-                                modalClosed={this.showModal} >
-                                <Form
-                                    fields={newLocationFields}
+                    <Button clicked={this.showModal} value="location">Add Location</Button>
+                    <Button clicked={this.showModal} value="onboardSensor">Onboard Sensor</Button>
+                    <Modal
+                        show={this.state.showModal}
+                        modalClosed={this.showModal} >
+                        {  
+                            this.state.modalType === 'location' 
+                                ? (<Form
+                                        formFields={newLocationFields}
+                                        reset={this.state.showModal}
+                                        submitForm={this.addLocationToCompany} />)
+                                : (<Form 
+                                    formFields={onboardSensorFields}
                                     reset={this.state.showModal}
-                                    submitForm={this.addLocationToCompany} />
-                            </Modal>)
-                            : null
-                    }
+                                    submitForm={this.onboardSensor} />)
+                        }
+                    </Modal>
                 </div>
             );
         }

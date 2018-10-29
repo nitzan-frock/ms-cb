@@ -10,7 +10,9 @@ export default class Form extends Component{
     constructor(props) {
         super(props);
         this.state = {
+            page: 1,
             fields: {},
+            propsFields: [],
             message: "",
             shouldReset: false
         }
@@ -18,7 +20,15 @@ export default class Form extends Component{
 
     componentDidMount() {
         const fields = {};
-        this.props.fields.forEach(field => {
+        let propsFields = [];
+
+        if (this.props.formFields instanceof Array) {
+            propsFields = this.props.formFields;
+        } else {
+            propsFields = this.props.formFields.step1.fields;
+        }
+
+        propsFields.forEach(field => {
             let formatter = input => input ;
             let formatOn = 'change';
 
@@ -44,10 +54,8 @@ export default class Form extends Component{
             this.setState(prevState => {
                 const fields = prevState.fields;
                 Object.keys(fields).forEach(field => {
-                        console.log(fields[field].type);
                         fields[field].value = "";
                 });
-                console.log(fields);
                 const shouldReset = !prevState.shouldReset;
 
                 return {fields, shouldReset};
@@ -103,7 +111,7 @@ export default class Form extends Component{
     render() {
         let fields = null;
         if (Object.keys(this.state.fields).length) {
-            fields = this.props.fields.map((field, index) => {
+            fields = this.state.propsFields.map((field, index) => {
                 return (
                     <Field
                         key={index}
@@ -126,9 +134,8 @@ export default class Form extends Component{
 };
 
 Form.propTypes = {
-    fields: PropTypes.arrayOf(PropTypes.shape(
-        {
-
-        }
-    ))
+    formFields: PropTypes.shape({
+        page:PropTypes.number,
+        fields: PropTypes.arrayOf(PropTypes.shape({}))
+    }).isRequired
 }

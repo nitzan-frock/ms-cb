@@ -54,24 +54,27 @@ export default class ItemInventory extends Component {
 
     render() {
         const formFields = [
-            {
-                type: "input",
-                name: "serial",
-                maxLength: 13,
-                placeholder: "Serial Number",
-                options: {
-                    formatter: StringManipulator.serialNumberFormatter,
-                    formatOn: 'blur'
-                }
-            },
-            {
-                type: "input",
-                name: "mac",
-                maxLength: 17,
-                placeholder: "MAC Address",
-                options: {
-                    formatter: StringManipulator.MACAddressFormatter
-                }
+            {fields: [
+                    {
+                        type: "input",
+                        name: "serial",
+                        maxLength: 13,
+                        placeholder: "Serial Number",
+                        options: {
+                            formatter: StringManipulator.serialNumberFormatter,
+                            formatOn: 'blur'
+                        }
+                    },
+                    {
+                        type: "input",
+                        name: "mac",
+                        maxLength: 17,
+                        placeholder: "MAC Address",
+                        options: {
+                            formatter: StringManipulator.MACAddressFormatter
+                        }
+                    }
+                ]
             }
         ];
          
@@ -79,7 +82,7 @@ export default class ItemInventory extends Component {
             <>
                 <Modal show={this.state.showModal} modalClosed={this.showModalHandler} >
                     <Form 
-                        formFields={formFields}
+                        sections={formFields}
                         reset={!this.state.showModal}
                         submitForm={this.addNewItemHandler}
                         invalidEntry={this.state.invalidEntry} />

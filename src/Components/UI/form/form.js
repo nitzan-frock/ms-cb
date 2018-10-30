@@ -10,76 +10,92 @@ export default class Form extends Component{
     constructor(props) {
         super(props);
         this.state = {
-            page: 1,
-            fields: {},
-            propsFields: [],
+            currentSection: 0,
+            sections: [],
             message: "",
             shouldReset: false
         }
     }
 
     componentDidMount() {
-        const fields = {};
-        let propsFields = [];
+        console.log(`[cdm]`);
+        console.log(this.props.sections);
+        let sections = [];
 
-        if (this.props.formFields instanceof Array) {
-            propsFields = this.props.formFields;
-        } else {
-            propsFields = this.props.formFields.step1.fields;
-        }
-
-        propsFields.forEach(field => {
-            let formatter = input => input ;
-            let formatOn = 'change';
-
-            if (field.options) {
-                formatter = field.options.formatter;
-                formatOn = field.options.formatOn ? field.options.formatOn : formatOn;
-            }
-
-            fields[field.name] = {
-                value: "",
-                formatter,
-                formatOn,
-                invalidEntry: false,
-                type: field.type
-            }
+        this.props.sections.forEach(section => {
+            sections.push({
+                fields: section.fields.map(field => this.buildField(field))
+            });
         });
-        this.setState({fields});
+        console.log(`sections created`);
+        console.log(sections);
+
+        this.setState({sections});
     }
 
     componentDidUpdate() {
-        //console.log(`[componentDidUpdate]`);
+        console.log(`[componentDidUpdate]`);
         if (this.props.reset !== this.state.shouldReset) {
             this.setState(prevState => {
-                const fields = prevState.fields;
-                Object.keys(fields).forEach(field => {
-                        fields[field].value = "";
+                const sections = prevState.sections;
+                sections.forEach(section => {
+                    section.fields.forEach(field => {
+                        field.value = "";
+                    });
                 });
+                console.log(sections);
+
                 const shouldReset = !prevState.shouldReset;
 
-                return {fields, shouldReset};
+                return {sections, shouldReset};
             })
         }
     }
 
-    fieldChanged = (event, fieldName) => {
-        event.preventDefault();
-        const fields = this.state.fields;
-        const formatter = fields[fieldName].formatter;
-        
-        if (fields[fieldName].formatOn === event.type && formatter) {
-            fields[fieldName].value = formatter(event.target.value);
-        } else {
-            fields[fieldName].value = event.target.value;
-        }
-        this.setState({fields});
+    // Initialization helper functions
+
+    buildField = field => {
+        field.options = this.setFieldOptions(field);
+        return {
+            ...field,
+            value: "",
+            invalidEntry: ""
+        };
     }
 
-    onSelectionChanged = (event, selection) => {
-        event.preventDefault();
-        const fields = this.state.fields;
+    setFieldOptions = field => {
+        const options = {
+            formatter: input => input,
+            formatOn: 'change'
+        };
 
+        if (field.options) {
+            Object.keys(options).forEach(option => {
+                if (field.options[option]) {
+                    options[option] = field.options[option];
+                }
+            });
+        }
+  
+        return options;
+    }
+
+    // Form Interaction Functions
+
+    fieldChanged = (event, field, sectionIndex, fieldIndex) => {
+        event.preventDefault();
+        const sections = this.state.sections;
+        const formatter = field.options.formatter;
+        
+        if (field.options.formatOn === event.type && formatter) {
+            field.value = formatter(event.target.value);
+        } else {
+            field.value = event.target.value;
+        }
+
+        sections[sectionIndex].fields[fieldIndex] = field;
+
+        this.setState({sections});
     }
 
     submitForm = async () => {
@@ -109,19 +125,25 @@ export default class Form extends Component{
     }
 
     render() {
-        let fields = null;
-        if (Object.keys(this.state.fields).length) {
-            fields = this.state.propsFields.map((field, index) => {
-                return (
-                    <Field
+        let fields = [];
+        const sectionIndex = this.state.currentSection;
+
+        console.log(this.state.sections[sectionIndex]);
+
+        if (this.state.sections[sectionIndex]) {
+            this.state.sections[sectionIndex].fields.forEach((field, index) => {
+                console.log(field);
+                fields.push(
+                    <Field 
                         key={index}
                         field={field}
-                        invalidEntry={this.state.fields[field.name].invalidEntry}
-                        value={this.state.fields[field.name].value}
-                        changed={(e) => this.fieldChanged(e, field.name)} />
+                        invalidEntry={this.props.invalidEntry}
+                        value={field.value}
+                        changed={(e) => this.fieldChanged(e, field, sectionIndex, index)} />
                 );
-            })
+            });
         }
+
         return (
             <>
                 <div className="form">
@@ -133,9 +155,11 @@ export default class Form extends Component{
     }
 };
 
+const field = PropTypes.object.isRequired;
+const section = PropTypes.shape({
+    fields: PropTypes.arrayOf(field).isRequired
+});
+
 Form.propTypes = {
-    formFields: PropTypes.shape({
-        page:PropTypes.number,
-        fields: PropTypes.arrayOf(PropTypes.shape({}))
-    }).isRequired
+    sections: PropTypes.arrayOf(section).isRequired
 }

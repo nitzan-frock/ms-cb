@@ -41,12 +41,12 @@ export default class MachinesOrganizer extends Component {
         const company_id = this.props.activeCompany.id;
         const defaultLocation_id = this.props.activeUser.defaultLocationId;
         const locations = await DataTools.getLocations({ company_id });
-        const datahubs = await DataTools.getDatahubs({company_id});
-        const sensors = await DataTools.getSensors({company_id});
+        const datahubs = await DataTools.getDatahubs({ company_id });
+        const sensors = await DataTools.getSensors({ company_id });
 
         if (!defaultLocation_id) {
             this.setState({
-                loading: false, 
+                loading: false,
                 locations,
                 datahubs,
                 sensors
@@ -72,7 +72,7 @@ export default class MachinesOrganizer extends Component {
     }
 
     async componentDidUpdate(prevProps, prevState) {
-        
+
     }
 
     onLocationSelectionChanged = async event => {
@@ -179,11 +179,11 @@ export default class MachinesOrganizer extends Component {
 
         try {
             const response = await DataTools.addLocation(location.name, location.description, company_id);
-            if (!response.ok){
+            if (!response.ok) {
                 throw response;
             }
-            const locations = await DataTools.getLocations({company_id});
-            this.setState({locations})
+            const locations = await DataTools.getLocations({ company_id });
+            this.setState({ locations })
             return response;
         }
         catch (err) {
@@ -203,8 +203,8 @@ export default class MachinesOrganizer extends Component {
             if (!response.ok) {
                 throw response;
             }
-            const zones = await DataTools.getZones({location_id: location.id});
-            this.setState({zones});
+            const zones = await DataTools.getZones({ location_id: location.id });
+            this.setState({ zones });
             return response;
         }
         catch (err) {
@@ -223,16 +223,16 @@ export default class MachinesOrganizer extends Component {
 
         try {
             const response = await DataTools.updateDatahub(
-                datahub, 
-                'add', 
-                {location: this.state.currentLocation}
+                datahub,
+                'add',
+                { location: this.state.currentLocation }
             );
-            if (!response.ok){
+            if (!response.ok) {
                 throw response;
             }
-            
-            const datahubs = await DataTools.getDatahubs({company_id});
-            this.setState({datahubs});
+
+            const datahubs = await DataTools.getDatahubs({ company_id });
+            this.setState({ datahubs });
             return response;
         }
         catch (err) {
@@ -252,7 +252,7 @@ export default class MachinesOrganizer extends Component {
 
         const locationSelectionItems = this.state.locations;
         const zoneSelectionItems = this.state.zones;
-        
+
 
         if (this.state.currentLocation) {
             locationSelection = (
@@ -297,18 +297,20 @@ export default class MachinesOrganizer extends Component {
                 );
             } else if (this.state.childOfLocation === ZONE) {
                 const newZoneFields = [
-                    {
-                        type: "input",
-                        name: "name",
-                        maxLength: 20,
-                        placeholder: "Zone Name"
-                    },
-                    {
-                        type: "input",
-                        name: "description",
-                        maxLength: 50,
-                        placeholder: "Description"
-                    }
+                    [{
+                        fields: [{
+                            type: "input",
+                            name: "name",
+                            maxLength: 20,
+                            placeholder: "Zone Name"
+                        },
+                        {
+                            type: "input",
+                            name: "description",
+                            maxLength: 50,
+                            placeholder: "Description"
+                        }]
+                    }]
                 ];
                 childSelection = (
                     <div>
@@ -317,8 +319,8 @@ export default class MachinesOrganizer extends Component {
                         <Modal
                             show={this.state.showModal}
                             modalClosed={this.showModal} >
-                            <Form 
-                                formFields={newZoneFields}
+                            <Form
+                                sections={newZoneFields}
                                 reset={this.state.showModal}
                                 submitForm={this.addZoneToLocation} />
                         </Modal>
@@ -329,17 +331,19 @@ export default class MachinesOrganizer extends Component {
                     if (!datahub.locationId) {
                         return datahub;
                     }
-                }).map(datahub => { 
+                }).map(datahub => {
                     const value = datahub.serial;
                     const displayName = datahub.displayName ? datahub.displayName : value;
-                    return {value, displayName};
+                    return { value, displayName };
                 });
                 const newDatahubFields = [
                     {
-                        name: "serial",
-                        type: "select",
-                        items: datahubs,
-                        defaultValue: "Select a Datahub"
+                        fields: [{
+                            name: "serial",
+                            type: "select",
+                            items: datahubs,
+                            defaultValue: "Select a Datahub"
+                        }]
                     }
                 ];
                 childSelection = (
@@ -350,7 +354,7 @@ export default class MachinesOrganizer extends Component {
                             show={this.state.showModal}
                             modalClosed={this.showModal} >
                             <Form
-                                formFields={newDatahubFields}
+                                sections={newDatahubFields}
                                 reset={this.state.showModal}
                                 submitForm={this.addDatahubToLocation} />
                         </Modal>
@@ -360,28 +364,32 @@ export default class MachinesOrganizer extends Component {
         } else {
             const newLocationFields = [
                 {
-                    type: "input",
-                    name: "name",
-                    maxLength: 20,
-                    placeholder: "Location Name"
-                },
-                {
-                    type: "input",
-                    name: "description",
-                    maxLength: 50,
-                    placeholder: "Description"
+                    fields: [{
+                        type: "input",
+                        name: "name",
+                        maxLength: 20,
+                        placeholder: "Location Name"
+                    },
+                    {
+                        type: "input",
+                        name: "description",
+                        maxLength: 50,
+                        placeholder: "Description"
+                    }]
                 }
             ];
 
             const sensors = this.state.sensors.map(sensor => {
-                return {value: sensor.serial, displayName: sensor.serial}
+                return { value: sensor.serial, displayName: sensor.serial }
             });
 
             const onboardSensorFields = [
                 {
-                    type: "select",
-                    name: "sensor-serial",
-                    items: sensors
+                    fields: [{
+                        type: "select",
+                        name: "sensor-serial",
+                        items: sensors
+                    }]
                 }
             ];
             // const onboardSensorFields = {
@@ -403,14 +411,14 @@ export default class MachinesOrganizer extends Component {
                     <Modal
                         show={this.state.showModal}
                         modalClosed={this.showModal} >
-                        {  
-                            this.state.modalType === 'location' 
+                        {
+                            this.state.modalType === 'location'
                                 ? (<Form
-                                        formFields={newLocationFields}
-                                        reset={this.state.showModal}
-                                        submitForm={this.addLocationToCompany} />)
-                                : (<Form 
-                                    formFields={onboardSensorFields}
+                                    sections={newLocationFields}
+                                    reset={this.state.showModal}
+                                    submitForm={this.addLocationToCompany} />)
+                                : (<Form
+                                    sections={onboardSensorFields}
                                     reset={this.state.showModal}
                                     submitForm={this.onboardSensor} />)
                         }
@@ -432,11 +440,11 @@ export default class MachinesOrganizer extends Component {
             cards = <MachineCards machines={this.state.machines} editMachine={this.editMachine} />
         } else if (this.state.showCardType === DATAHUB) {
             cards = (
-                <DatahubCards 
+                <DatahubCards
                     datahubs={
                         this.state.datahubs.filter(datahub => {
                             return datahub.locationId === this.state.currentLocation.id ? datahub : null
-                        }) 
+                        })
                     }
                     enterDatahub={this.enterDatahub} />
             )

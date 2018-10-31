@@ -120,9 +120,11 @@ export default class DataTools {
         })).json();
     }
 
-    /**
-     *  Functions to register items to Database
-    **/
+    /******************************************************************
+     *
+     * Functions to register items to Database
+     *  
+     ******************************************************************/
 
     static async registerItemToCompany({serial, mac}, company_id) {
         const inventory = await this.getAvailableInventory();
@@ -151,8 +153,8 @@ export default class DataTools {
             }
             return {ok: true, body: "success"};
         } else {
-            const failedProperty = this._resolveInvalidField({serial, mac}, inventory);
-            return {ok: false, body: failedProperty};
+            const invalidFields = this._resolveInvalidFields({serial, mac}, inventory);
+            return {ok: false, body: invalidFields};
         }
     }
 
@@ -187,34 +189,61 @@ export default class DataTools {
         });
     }
 
-    static _resolveInvalidField(fields = {}, inventory) {
-        const invalidFields = [];
-        let message = "";
+    static _resolveInvalidFields(fields, inventory) {
+        const emptyFields = this._checkEmptyFields(fields);
+        if (emptyFields) {return emptyFields};
 
+        if (this._isItemAssignedToCompany(inventory, fields)) { 
+            return {
+                invalidFields: Object.keys(fields), 
+                message: "This item is already assigned to a company."
+            }
+        }
+
+        return this._getInvalidFields(inventory, fields);
+    }
+
+    static _checkEmptyFields(fields) {
+        const emptyFields = [];
         Object.keys(fields).forEach(field => {
-            if (fields[field] === "") invalidFields.push(field);
+            if (fields[field] === "") emptyFields.push(field);
+        });
+        return emptyFields.length 
+            ? {invalidFields: emptyFields, message: "Cannot have empty fields."}
+            : null;
+    } 
 
+    static _isItemAssignedToCompany(inventory, fields) {
+        let isAssigned = false;
+        Object.keys(fields).forEach(field => {
+            if (isAssigned) return;
             inventory.forEach(item => {
-                if (message) return;
                 if (item.companyId && item[field] === fields[field]) {
-                    invalidFields.push("all");
-                    message = "This item is already assigned to a company.";
+                    isAssigned = true;
                     return;
                 }
             });
-            if (message) return;
-
-            const validField = inventory.some(item => {
-                item[field] === fields[field] ? true : false;    
-            });
-            
-            if (!validField) invalidFields.push(field);
         });
-
-        return {invalidFields, message};
+        return isAssigned;
     }
 
-    // Add new locations, zones, machines
+    static _getInvalidFields(inventory, fields) {
+        const invalidFields = [];        
+        Object.keys(fields).forEach(field => {
+            inventory.forEach(item => {
+                if (item[field] !== fields[field]) {
+                    invalidFields.push(field);
+                }
+            });
+        });
+        return {invalidFields, message: "The marked fields do not match our records."};
+    }
+
+    /******************************************************************
+     *
+     * Add new locations, zones, machines
+     *  
+     ******************************************************************/
 
     static async addLocation(name, description, company_id) {
         let url = `http://localhost:8080/locations`;
@@ -248,9 +277,11 @@ export default class DataTools {
         return {ok: false, body: "Failed to add zone."}
     }
 
-    /*
-     *  Update database records.
-     */
+    /******************************************************************
+     *
+     * Update database records.
+     *  
+     ******************************************************************/
 
     static async updateLocation(location, option, {datahub, zone}) {
         const url = `http://localhost:8080/locations/`;

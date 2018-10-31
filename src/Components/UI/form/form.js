@@ -10,44 +10,34 @@ export default class Form extends Component{
     constructor(props) {
         super(props);
         this.state = {
-            currentSection: 0,
-            sections: [],
+            currentSection: 1,
+            fields: [],
             message: "",
             shouldReset: false
         }
     }
 
     componentDidMount() {
-        console.log(`[cdm]`);
-        console.log(this.props.sections);
-        let sections = [];
+        let fields = [];
 
-        this.props.sections.forEach(section => {
-            sections.push({
-                fields: section.fields.map(field => this.buildField(field))
-            });
+        this.props.fields.forEach(field => {
+            fields.push(this.buildField(field));
         });
-        console.log(`sections created`);
-        console.log(sections);
-
-        this.setState({sections});
+        this.setState({fields});
     }
 
     componentDidUpdate() {
-        console.log(`[componentDidUpdate]`);
         if (this.props.reset !== this.state.shouldReset) {
             this.setState(prevState => {
-                const sections = prevState.sections;
-                sections.forEach(section => {
-                    section.fields.forEach(field => {
-                        field.value = "";
-                    });
+                const fields = prevState.fields;
+                fields.forEach(field => {
+                    field.value = "";
+                    field.isValid = true;
                 });
-                console.log(sections);
 
                 const shouldReset = !prevState.shouldReset;
 
-                return {sections, shouldReset};
+                return {fields, shouldReset};
             })
         }
     }
@@ -59,7 +49,7 @@ export default class Form extends Component{
         return {
             ...field,
             value: "",
-            invalidEntry: ""
+            isValid: true
         };
     }
 
@@ -82,72 +72,67 @@ export default class Form extends Component{
 
     // Form Interaction Functions
 
-    fieldChanged = (event, field, sectionIndex, fieldIndex) => {
+    fieldChanged = (event, field, fieldIndex) => {
         event.preventDefault();
-        const sections = this.state.sections;
+        const fields = this.state.fields;
         const formatter = field.options.formatter;
+        const formatOn = field.options.formatOn;
         
-        if (field.options.formatOn === event.type && formatter) {
+        if (formatOn === event.type && formatter) {
             field.value = formatter(event.target.value);
         } else {
             field.value = event.target.value;
         }
 
-        sections[sectionIndex].fields[fieldIndex] = field;
+        fields[fieldIndex] = field;
 
-        this.setState({sections});
+        this.setState({fields});
     }
 
     submitForm = async () => {
         let submitValues = {};
         const fields = this.state.fields;
 
-        Object.keys(fields).map(field => {
-            submitValues[field] = fields[field].value;
+        fields.forEach(field => {
+            submitValues[field.name] = field.value;
         });
 
         const response = await this.props.submitForm(submitValues);
 
         if (!response.ok) {
-            response.body.invalidFields.forEach(field => {
-                if (field === "all") {
-                    Object.keys(fields).map(field => {
-                        fields[field].invalidEntry = true;
-                    });
-                } else {
-                    fields[field].invalidEntry = true;
-                }
+            response.body.invalidFields.forEach(invalidField => {
+                fields.forEach(field => {
+                    if (field.name === invalidField) {
+                        field.isValid = false;
+                    }
+                });
             });
             this.setState({fields, message: response.body.message});
         } else {
-            this.setState({shouldReset: !this.props.reset})
+            this.setState({shouldReset: !this.props.reset, message: response.body.message});
         }
     }
 
     render() {
         let fields = [];
-        const sectionIndex = this.state.currentSection;
+        let currentSection = this.state.currentSection;
 
-        console.log(this.state.sections[sectionIndex]);
-
-        if (this.state.sections[sectionIndex]) {
-            this.state.sections[sectionIndex].fields.forEach((field, index) => {
-                console.log(field);
+        this.state.fields.forEach((field, index) => {
+            if (field.section <= currentSection) {
                 fields.push(
                     <Field 
                         key={index}
                         field={field}
-                        invalidEntry={this.props.invalidEntry}
-                        value={field.value}
-                        changed={(e) => this.fieldChanged(e, field, sectionIndex, index)} />
+                        changed={(e) => this.fieldChanged(e, field, index)} />
                 );
-            });
-        }
+            }
+        });
 
         return (
             <>
                 <div className="form">
                     {fields}
+                    {this.state.message ? <p>{this.state.message}</p> : null}
                     <Button clicked={this.submitForm} >Submit</Button>
                 </div>
             </>
@@ -156,10 +141,7 @@ export default class Form extends Component{
 };
 
 const field = PropTypes.object.isRequired;
-const section = PropTypes.shape({
-    fields: PropTypes.arrayOf(field).isRequired
-});
 
 Form.propTypes = {
-    sections: PropTypes.arrayOf(section).isRequired
+    fields: PropTypes.arrayOf(field).isRequired
 }

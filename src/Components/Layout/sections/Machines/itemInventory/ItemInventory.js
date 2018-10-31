@@ -54,27 +54,26 @@ export default class ItemInventory extends Component {
 
     render() {
         const formFields = [
-            {fields: [
-                    {
-                        type: "input",
-                        name: "serial",
-                        maxLength: 13,
-                        placeholder: "Serial Number",
-                        options: {
-                            formatter: StringManipulator.serialNumberFormatter,
-                            formatOn: 'blur'
-                        }
-                    },
-                    {
-                        type: "input",
-                        name: "mac",
-                        maxLength: 17,
-                        placeholder: "MAC Address",
-                        options: {
-                            formatter: StringManipulator.MACAddressFormatter
-                        }
-                    }
-                ]
+            {
+                section: 1,
+                type: "input",
+                name: "serial",
+                maxLength: 13,
+                placeholder: "Serial Number",
+                options: {
+                    formatter: StringManipulator.serialNumberFormatter,
+                    formatOn: 'blur'
+                }
+            },
+            {
+                section: 1,
+                type: "input",
+                name: "mac",
+                maxLength: 17,
+                placeholder: "MAC Address",
+                options: {
+                    formatter: StringManipulator.MACAddressFormatter
+                }
             }
         ];
          
@@ -82,7 +81,7 @@ export default class ItemInventory extends Component {
             <>
                 <Modal show={this.state.showModal} modalClosed={this.showModalHandler} >
                     <Form 
-                        sections={formFields}
+                        fields={formFields}
                         reset={!this.state.showModal}
                         submitForm={this.addNewItemHandler}
                         invalidEntry={this.state.invalidEntry} />

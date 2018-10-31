@@ -198,6 +198,15 @@
       "datahubCount": 2,
       "zoneCount": 0,
       "id": 6
+    },
+    {
+      "displayName": "adas",
+      "description": "asdasd",
+      "companyId": 2,
+      "dataType": "location",
+      "datahubCount": 0,
+      "zoneCount": 0,
+      "id": 7
     }
   ],
   "zones": [

@@ -33,7 +33,7 @@ export default class MachinesOrganizer extends Component {
             currentZone: undefined,
             currentDatahub: undefined,
             showModal: false,
-            modalType: null
+            modal: null
         };
     }
 
@@ -166,8 +166,9 @@ export default class MachinesOrganizer extends Component {
     }
 
     showModal = (type) => {
+        console.log(type);
         const prevState = { ...this.state };
-        this.setState({ showModal: !prevState.showModal, modalType: type });
+        this.setState({ showModal: !prevState.showModal, modal: type });
     }
 
     addLocationToCompany = async (formValues) => {
@@ -222,9 +223,7 @@ export default class MachinesOrganizer extends Component {
         })[0];
 
         try {
-            const response = await DataTools.updateDatahub(
-                datahub,
-                'add',
+            const response = await DataTools.updateDatahub(datahub, 'add',
                 { location: this.state.currentLocation }
             );
             if (!response.ok) {
@@ -297,20 +296,20 @@ export default class MachinesOrganizer extends Component {
                 );
             } else if (this.state.childOfLocation === ZONE) {
                 const newZoneFields = [
-                    [{
-                        fields: [{
-                            type: "input",
-                            name: "name",
-                            maxLength: 20,
-                            placeholder: "Zone Name"
-                        },
-                        {
-                            type: "input",
-                            name: "description",
-                            maxLength: 50,
-                            placeholder: "Description"
-                        }]
-                    }]
+                    {
+                        section: 1,
+                        type: "input",
+                        name: "name",
+                        maxLength: 20,
+                        placeholder: "Zone Name"
+                    },
+                    {
+                        section: 1,
+                        type: "input",
+                        name: "description",
+                        maxLength: 50,
+                        placeholder: "Description"
+                    }
                 ];
                 childSelection = (
                     <div>
@@ -320,7 +319,7 @@ export default class MachinesOrganizer extends Component {
                             show={this.state.showModal}
                             modalClosed={this.showModal} >
                             <Form
-                                sections={newZoneFields}
+                                fields={newZoneFields}
                                 reset={this.state.showModal}
                                 submitForm={this.addZoneToLocation} />
                         </Modal>
@@ -338,12 +337,11 @@ export default class MachinesOrganizer extends Component {
                 });
                 const newDatahubFields = [
                     {
-                        fields: [{
-                            name: "serial",
-                            type: "select",
-                            items: datahubs,
-                            defaultValue: "Select a Datahub"
-                        }]
+                        section: 1,
+                        name: "serial",
+                        type: "select",
+                        items: datahubs,
+                        defaultValue: "Select a Datahub"
                     }
                 ];
                 childSelection = (
@@ -354,7 +352,7 @@ export default class MachinesOrganizer extends Component {
                             show={this.state.showModal}
                             modalClosed={this.showModal} >
                             <Form
-                                sections={newDatahubFields}
+                                fields={newDatahubFields}
                                 reset={this.state.showModal}
                                 submitForm={this.addDatahubToLocation} />
                         </Modal>
@@ -364,18 +362,18 @@ export default class MachinesOrganizer extends Component {
         } else {
             const newLocationFields = [
                 {
-                    fields: [{
-                        type: "input",
-                        name: "name",
-                        maxLength: 20,
-                        placeholder: "Location Name"
-                    },
-                    {
-                        type: "input",
-                        name: "description",
-                        maxLength: 50,
-                        placeholder: "Description"
-                    }]
+                    section: 1,
+                    type: "input",
+                    name: "name",
+                    maxLength: 20,
+                    placeholder: "Location Name"
+                },
+                {
+                    section: 1,
+                    type: "input",
+                    name: "description",
+                    maxLength: 50,
+                    placeholder: "Description"
                 }
             ];
 
@@ -385,44 +383,56 @@ export default class MachinesOrganizer extends Component {
 
             const onboardSensorFields = [
                 {
-                    fields: [{
-                        type: "select",
-                        name: "sensor-serial",
-                        items: sensors
-                    }]
+                    section: 1,
+                    type: "select",
+                    name: "serial",
+                    items: sensors
+                },
+                {
+                    section: 1,
+                    type: "radio",
+                    name: "machine",
+                    legend: "Will this be a new or existing machine?",
+                    items: [{value: "new", label: "New"}, {value: "existing", label: "Existing"}]
                 }
             ];
-            // const onboardSensorFields = {
-            //     page: 1,
-            //     fields: [
-            //         {
-            //             type: "select",
-            //             name: "sensor-serial",
-            //             items: sensors
-            //         }
-            //     ]
-            // }
+
+            let modal = null;
+            switch (this.state.modal) {
+                case 'location':
+                    modal = (
+                        <Modal
+                            show={this.state.showModal}
+                            modalClosed={this.showModal} >
+                            <Form
+                                fields={newLocationFields}
+                                reset={this.state.showModal}
+                                submitForm={this.addLocationToCompany} />
+                        </Modal>
+                    );
+                    break;
+                case 'onboardSensor':
+                    modal = (
+                        <Modal
+                            show={this.state.showModal}
+                            modalClosed={this.showModal} >
+                            <Form
+                                fields={onboardSensorFields}
+                                reset={this.state.showModal}
+                                submitForm={this.onboardSensor} />
+                        </Modal>
+                    );
+                    break;
+                default: 
+                    break;
+            }
 
             locationSelection = (
                 <div>
                     <span>Locations</span>
-                    <Button clicked={this.showModal} value="location">Add Location</Button>
-                    <Button clicked={this.showModal} value="onboardSensor">Onboard Sensor</Button>
-                    <Modal
-                        show={this.state.showModal}
-                        modalClosed={this.showModal} >
-                        {
-                            this.state.modalType === 'location'
-                                ? (<Form
-                                    sections={newLocationFields}
-                                    reset={this.state.showModal}
-                                    submitForm={this.addLocationToCompany} />)
-                                : (<Form
-                                    sections={onboardSensorFields}
-                                    reset={this.state.showModal}
-                                    submitForm={this.onboardSensor} />)
-                        }
-                    </Modal>
+                    <Button clicked={() => this.showModal('location')} >Add Location</Button>
+                    <Button clicked={() => this.showModal('onboardSensor')} >Onboard Sensor</Button>
+                    {modal}
                 </div>
             );
         }

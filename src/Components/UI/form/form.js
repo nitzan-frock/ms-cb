@@ -18,10 +18,12 @@ export default class Form extends Component{
     }
 
     componentDidMount() {
+
+        console.log(`cdm`);
         let fields = [];
 
         this.props.fields.forEach(field => {
-            fields.push(this.buildField(field));
+            fields.push(this.buildFieldProps(field));
         });
         this.setState({fields});
     }
@@ -44,10 +46,10 @@ export default class Form extends Component{
 
     // Initialization helper functions
 
-    buildField = field => {
-        field.options = this.setFieldOptions(field);
+    buildFieldProps = props => {
+        props.options = this.setFieldOptions(props);
         return {
-            ...field,
+            ...props,
             value: "",
             isValid: true
         };
@@ -56,8 +58,14 @@ export default class Form extends Component{
     setFieldOptions = field => {
         const options = {
             formatter: input => input,
-            formatOn: 'change'
+            formatOn: 'change',
+            isVisible: [{callback: () => true, id: null}],
+            filterByField: null
         };
+
+        // if (field.type === 'select') {
+        //     field.options.filterByField = null;
+        // }
 
         if (field.options) {
             Object.keys(options).forEach(option => {
@@ -73,20 +81,55 @@ export default class Form extends Component{
     // Form Interaction Functions
 
     fieldChanged = (event, field, fieldIndex) => {
-        event.preventDefault();
+        console.log(`[fieldChanged]`);
+        
         const fields = this.state.fields;
         const formatter = field.options.formatter;
         const formatOn = field.options.formatOn;
         
-        if (formatOn === event.type && formatter) {
+        if (field.type === 'input' && event.type === formatOn) {
+            console.log(`input changed`);
             field.value = formatter(event.target.value);
         } else {
             field.value = event.target.value;
         }
-
+        
         fields[fieldIndex] = field;
 
-        this.setState({fields});
+        this.setState({fields, currentSection: this.nextSection(fieldIndex)});
+    }
+
+    nextSection = (currentIndex) => {
+        const fields = this.state.fields;
+        const currentSection = this.state.currentSection;
+        const nextField = fields[currentIndex + 1];
+
+        if (nextField.section > currentSection) {
+            return nextField.section;
+        }
+        return currentSection;
+    }
+
+    isFieldVisible = (field) => {
+        console.log(`\n[isFieldVisible]`);
+        return field.options.isVisible.every(check => {
+            if (!check.id) return true;
+
+            const dependentField = this.state.fields[check.id];
+            console.log(dependentField);
+            return check.callback(dependentField.value);
+        });
+    }
+
+    filterFieldItems = field => {
+        console.log(`\n[filterFieldItems]`);
+        const filterField_id = field.options.filterByField.id
+        const filterValue = this.state.fields[filterField_id].value;
+        const callback = field.options.filterByField.callback;
+
+        console.log(field);
+
+        field.items.filter(item => callback(filterValue, item.filterValue) ? item : null);
     }
 
     submitForm = async () => {
@@ -114,17 +157,26 @@ export default class Form extends Component{
     }
 
     render() {
+        console.log(`[render]`);
         let fields = [];
         let currentSection = this.state.currentSection;
 
         this.state.fields.forEach((field, index) => {
             if (field.section <= currentSection) {
-                fields.push(
+                const isVisible = this.isFieldVisible(field);
+                console.log(``);
+                if (field.options.filterByField) {
+                    console.log(`filter ${field.name} by field`);
+                    console.log(field);
+                    field.items = this.filterFieldItems(field);
+                }
+                isVisible ? fields.push(
                     <Field 
                         key={index}
                         field={field}
                         changed={(e) => this.fieldChanged(e, field, index)} />
-                );
+                )
+                : null;
             }
         });
 

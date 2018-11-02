@@ -120,10 +120,12 @@ export default class MachinesOrganizer extends Component {
     }
 
     enterLocation = async (location, toShow) => {
+        const machines = await this.getMachinesFor(location);
         if (toShow === DATAHUB || this.state.childOfLocation === DATAHUB) {
-            const datahubs = (await DataTools.getDatahubs({ company_id: this.props.activeCompany.id }));
+            const datahubs = await DataTools.getDatahubs({ company_id: this.props.activeCompany.id });
             this.setState({
-                datahubs,
+                datahubs: await datahubs,
+                machines: await machines,
                 showCardType: DATAHUB,
                 childOfLocation: DATAHUB,
                 currentLocation: location,
@@ -133,6 +135,7 @@ export default class MachinesOrganizer extends Component {
             const zones = await DataTools.getZones({ location_id: location.id });
             this.setState({
                 zones,
+                machines,
                 showCardType: ZONE,
                 childOfLocation: ZONE,
                 currentLocation: location,
@@ -142,12 +145,12 @@ export default class MachinesOrganizer extends Component {
     }
 
     enterZone = async zone => {
-        const machines = await this.getMachinesFor(zone);
+        const machines = this.state.machines.filter(machine => machine.zoneId === zone.id ? machine : null);
         this.setState({ machines, currentZone: zone, showCardType: MACHINE_CARDS })
     }
 
     enterDatahub = async datahub => {
-        const machines = await this.getMachinesFor(datahub);
+        const machines = this.state.machines.filter(machine => machine.datahubSerial === datahub.serial ? machine : null);
         this.setState({ machines, currentDatahub: datahub, showCardType: MACHINE_CARDS })
     }
 
@@ -156,17 +159,18 @@ export default class MachinesOrganizer extends Component {
     }
 
     getMachinesFor = async container => {
+        let location_id;
         let zone_id;
         let datahub_serial;
 
-        if (container.dataType === 'zone') zone_id = container.id;
+        if (container.dataType === 'location') location_id = container.id;
+        else if (container.dataType === 'zone') zone_id = container.id;
         else if (container.dataType === 'datahub') datahub_serial = container.serial;
 
-        return await DataTools.getMachines({ zone_id, datahub_serial });
+        return await DataTools.getMachines({ location_id, zone_id, datahub_serial });
     }
 
     showModal = (type) => {
-        console.log(type);
         const prevState = { ...this.state };
         this.setState({ showModal: !prevState.showModal, modal: type });
     }
@@ -252,49 +256,144 @@ export default class MachinesOrganizer extends Component {
         const locationSelectionItems = this.state.locations;
         const zoneSelectionItems = this.state.zones;
 
-
-        if (this.state.currentLocation) {
-            locationSelection = (
-                <div>
-                    <a href="#" onClick={this.showLocations}>Locations</a><span>&raquo;</span>
-                    <Selection
-                        value={this.state.currentLocation.displayName}
-                        changed={this.onLocationSelectionChanged}
-                        items={locationSelectionItems} />
-                </div>
-            );
-            if (this.state.currentZone) {
-                const selectedZone = this.state.currentZone.displayName;
-
-
-                childSelection = (
-                    <div>
-                        <a href="#" onClick={() => this.showZones(this.state.currentLocation)}>Zones</a><span>&raquo;</span>
-                        <Selection
-                            value={selectedZone}
-                            changed={this.onZoneSelectionChanged}
-                            items={zoneSelectionItems} />
-                        <Button clicked={this.showModal}>Onboard Sensor</Button>
-                    </div>
-                );
-            } else if (this.state.currentDatahub) {
-                const datahubSelectionItems = this.state.datahubs.filter(datahub => {
-                    if (datahub.locationId === this.state.currentLocation.id) {
-                        return datahub;
+        let modal = null;
+        switch (this.state.modal) {
+            case 'location':
+                const newLocationFields = [
+                    {
+                        section: 1,
+                        type: "input",
+                        name: "name",
+                        maxLength: 20,
+                        placeholder: "Location Name"
+                    },
+                    {
+                        section: 1,
+                        type: "input",
+                        name: "description",
+                        maxLength: 50,
+                        placeholder: "Description"
                     }
-                });
-                const selectedDatahub = this.state.currentDatahub.displayName;
-
-                childSelection = (
-                    <div>
-                        <a href="#" onClick={() => this.showDatahubs(this.state.currentLocation)}>Datahubs&raquo;</a>
-                        <Selection
-                            value={selectedDatahub}
-                            changed={this.onDatahubSelectionChanged}
-                            items={datahubSelectionItems} />
-                    </div>
+                ];
+                modal = (
+                    <Modal
+                        show={this.state.showModal}
+                        modalClosed={this.showModal} >
+                        <Form
+                            fields={newLocationFields}
+                            reset={this.state.showModal}
+                            submitForm={this.addLocationToCompany} />
+                    </Modal>
                 );
-            } else if (this.state.childOfLocation === ZONE) {
+                break;
+            case 'onboardSensor':
+                const sensors = this.state.sensors.map(sensor => {
+                    return { value: sensor.serial, displayName: sensor.serial }
+                });
+                console.log(`[machineOrganizer]`);
+                console.log(this.state.machines);
+
+                const isNewMachine = val => {
+                    console.log(`isNewMachine`);
+                    console.log(val);
+                    return val === "new";
+                }
+
+                const isExistingMachine = val => {
+                    return val === "existing";
+                }
+
+                const isVPAorCA = val => {
+                    return val.match(/ca|vpa/i) ? true : false;
+                }
+
+                const isZoneSelected = val => {
+                    return val ? true : false;
+                }
+
+                const filterByZone = (val, zone_id) => {
+                    return val === zone_id ? val : null;
+                }
+
+                const onboardSensorFields = [
+                    {
+                        section: 1,
+                        id: 0,
+                        type: "select",
+                        name: "sensor",
+                        items: sensors
+                    },
+                    {
+                        section: 1,
+                        id: 1,
+                        type: "radio",
+                        name: "machineType",
+                        legend: "Will this be a new or existing machine?",
+                        items: [
+                            {value: "new", label: "New"}, 
+                            {value: "existing", label: "Existing"}
+                        ]
+                    },
+                    {
+                        section: 2,
+                        id: 2,
+                        type: "select",
+                        name: "zone",
+                        items: this.state.zones.map(zone => {
+                            return {value: zone.id, displayName: zone.displayName};
+                        })
+                    },
+                    {
+                        section: 2,
+                        id: 3,
+                        type: "input",
+                        name: "newMachine",
+                        maxLength: 20,
+                        placeholder: "Machine Name",
+                        options: {
+                            isVisible: [{callback: isNewMachine, id: 1}]
+                        }
+                    },
+                    {
+                        section: 2,
+                        id: 4,
+                        type: "select",
+                        name: "existingMachine",
+                        items: this.state.machines.map(machine => {
+                            return {
+                                value: machine.id, 
+                                filterValue: machine.zoneId, 
+                                displayName: machine.displayName
+                            }
+                        }),
+                        options: {
+                            isVisible: [{callback: isExistingMachine, id: 1}, {callback: isZoneSelected, id: 2}],
+                            filterByField: {callback: filterByZone, id: 2}
+                        }
+                    },
+                    {
+                        section: 3,
+                        id: 5,
+                        type: "select",
+                        name: "datahub",
+                        items: this.state.datahubs,
+                        options: {
+                            isVisible: [{sensor: isVPAorCA}]
+                        }
+                    }
+                ];
+                modal = (
+                    <Modal
+                        show={this.state.showModal}
+                        modalClosed={this.showModal} >
+                        <Form
+                            fields={onboardSensorFields}
+                            reset={this.state.showModal}
+                            submitForm={this.onboardSensor} />
+                    </Modal>
+                );
+                break;
+            case 'zone': 
                 const newZoneFields = [
                     {
                         section: 1,
@@ -311,21 +410,18 @@ export default class MachinesOrganizer extends Component {
                         placeholder: "Description"
                     }
                 ];
-                childSelection = (
-                    <div>
-                        <span>Zones</span>
-                        <Button clicked={this.showModal}>Add Zone</Button>
-                        <Modal
-                            show={this.state.showModal}
-                            modalClosed={this.showModal} >
-                            <Form
-                                fields={newZoneFields}
-                                reset={this.state.showModal}
-                                submitForm={this.addZoneToLocation} />
-                        </Modal>
-                    </div>
+                modal = (
+                    <Modal
+                        show={this.state.showModal}
+                        modalClosed={this.showModal} >
+                        <Form
+                            fields={newZoneFields}
+                            reset={this.state.showModal}
+                            submitForm={this.addZoneToLocation} />
+                    </Modal>
                 );
-            } else if (this.state.childOfLocation === DATAHUB) {
+                break;
+            case 'datahub':
                 let datahubs = this.state.datahubs.filter(datahub => {
                     if (!datahub.locationId) {
                         return datahub;
@@ -344,94 +440,82 @@ export default class MachinesOrganizer extends Component {
                         defaultValue: "Select a Datahub"
                     }
                 ];
+                modal = (
+                    <Modal
+                        show={this.state.showModal}
+                        modalClosed={this.showModal} >
+                        <Form
+                            fields={newDatahubFields}
+                            reset={this.state.showModal}
+                            submitForm={this.addDatahubToLocation} />
+                    </Modal>
+                );
+                break;
+            default: 
+                break;
+        }
+
+        if (this.state.currentLocation) {
+            locationSelection = (
+                <div>
+                    <a href="#" onClick={this.showLocations}>Locations</a><span>&raquo;</span>
+                    <Selection
+                        value={this.state.currentLocation.displayName}
+                        changed={this.onLocationSelectionChanged}
+                        items={locationSelectionItems} />
+                </div>
+            );
+            if (this.state.currentZone) {
+                const selectedZone = this.state.currentZone.displayName;
+                childSelection = (
+                    <div>
+                        <a href="#" onClick={() => this.showZones(this.state.currentLocation)}>Zones</a><span>&raquo;</span>
+                        <Selection
+                            value={selectedZone}
+                            changed={this.onZoneSelectionChanged}
+                            items={zoneSelectionItems} />
+                        <Button clicked={this.showModal}>Onboard Sensor</Button>
+                    </div>
+                );
+            } else if (this.state.currentDatahub) {
+                const datahubSelectionItems = this.state.datahubs.filter(datahub => {
+                    if (datahub.locationId === this.state.currentLocation.id) {
+                        return datahub;
+                    }
+                });
+                const selectedDatahub = this.state.currentDatahub.displayName;
+                childSelection = (
+                    <div>
+                        <a href="#" onClick={() => this.showDatahubs(this.state.currentLocation)}>Datahubs&raquo;</a>
+                        <Selection
+                            value={selectedDatahub}
+                            changed={this.onDatahubSelectionChanged}
+                            items={datahubSelectionItems} />
+                    </div>
+                );
+            } else if (this.state.childOfLocation === ZONE) {
+                childSelection = (
+                    <div>
+                        <span>Zones</span>
+                        <Button clicked={() => this.showModal('zone')}>Add Zone</Button>
+                        <Button clicked={() => this.showModal('onboardSensor')} >Onboard Sensor</Button>
+                        {modal}
+                    </div>
+                );
+            } else if (this.state.childOfLocation === DATAHUB) {
                 childSelection = (
                     <div>
                         <span>Datahubs</span>
-                        <Button clicked={this.showModal}>Add Datahub</Button>
-                        <Modal
-                            show={this.state.showModal}
-                            modalClosed={this.showModal} >
-                            <Form
-                                fields={newDatahubFields}
-                                reset={this.state.showModal}
-                                submitForm={this.addDatahubToLocation} />
-                        </Modal>
+                        <Button clicked={() => this.showModal('datahub')}>Add Datahub</Button>
+                        {modal}
                     </div>
                 );
             }
         } else {
-            const newLocationFields = [
-                {
-                    section: 1,
-                    type: "input",
-                    name: "name",
-                    maxLength: 20,
-                    placeholder: "Location Name"
-                },
-                {
-                    section: 1,
-                    type: "input",
-                    name: "description",
-                    maxLength: 50,
-                    placeholder: "Description"
-                }
-            ];
-
-            const sensors = this.state.sensors.map(sensor => {
-                return { value: sensor.serial, displayName: sensor.serial }
-            });
-
-            const onboardSensorFields = [
-                {
-                    section: 1,
-                    type: "select",
-                    name: "serial",
-                    items: sensors
-                },
-                {
-                    section: 1,
-                    type: "radio",
-                    name: "machine",
-                    legend: "Will this be a new or existing machine?",
-                    items: [{value: "new", label: "New"}, {value: "existing", label: "Existing"}]
-                }
-            ];
-
-            let modal = null;
-            switch (this.state.modal) {
-                case 'location':
-                    modal = (
-                        <Modal
-                            show={this.state.showModal}
-                            modalClosed={this.showModal} >
-                            <Form
-                                fields={newLocationFields}
-                                reset={this.state.showModal}
-                                submitForm={this.addLocationToCompany} />
-                        </Modal>
-                    );
-                    break;
-                case 'onboardSensor':
-                    modal = (
-                        <Modal
-                            show={this.state.showModal}
-                            modalClosed={this.showModal} >
-                            <Form
-                                fields={onboardSensorFields}
-                                reset={this.state.showModal}
-                                submitForm={this.onboardSensor} />
-                        </Modal>
-                    );
-                    break;
-                default: 
-                    break;
-            }
-
             locationSelection = (
                 <div>
                     <span>Locations</span>
                     <Button clicked={() => this.showModal('location')} >Add Location</Button>
-                    <Button clicked={() => this.showModal('onboardSensor')} >Onboard Sensor</Button>
                     {modal}
                 </div>
             );

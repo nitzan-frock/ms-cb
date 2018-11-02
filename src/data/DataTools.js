@@ -75,9 +75,12 @@ export default class DataTools {
         return await this._getData(url);
     }
 
-    static async getMachines({zone_id, datahub_serial, machine_id}) {
-        let url = `http://localhost:8080/machines?&zoneId=${zone_id}`;
-        if (datahub_serial) {
+    static async getMachines({location_id, zone_id, datahub_serial, machine_id}) {
+        let url = `http://localhost:8080/machines?locationId=${location_id}`;
+
+        if (zone_id) {
+            url = `http://localhost:8080/machines?&zoneId=${zone_id}`;
+        } else if (datahub_serial) {
             url = `http://localhost:8080/machines?datahubSerial=${datahub_serial}`;
         } else if (machine_id) {
             url = `http://localhost:8080/machines?id=${machine_id}`;

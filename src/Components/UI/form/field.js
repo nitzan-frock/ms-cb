@@ -42,7 +42,9 @@ const field = (props) => {
             field = (
                 <Radio
                     legend={props.field.legend}
-                    buttons={props.field.items} />
+                    buttons={props.field.items}
+                    value={props.field.value}
+                    changed={props.changed} />
             )
         default:
             break;

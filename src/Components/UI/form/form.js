@@ -11,24 +11,28 @@ export default class Form extends Component{
         super(props);
         this.state = {
             currentSection: 1,
+            currentField: 0,
             fields: [],
+            indices: {},
             message: "",
             shouldReset: false
         }
     }
 
     componentDidMount() {
-
-        console.log(`cdm`);
+        console.log(`[cdm]`);
         let fields = [];
+        let indices = {};
 
-        this.props.fields.forEach(field => {
+        this.props.fields.forEach((field, index) => {
             fields.push(this.buildFieldProps(field));
+            indices[field.name] = index;
         });
-        this.setState({fields});
+        this.setState({fields, indices});
     }
 
     componentDidUpdate() {
+        console.log(`[cdu]`);
         if (this.props.reset !== this.state.shouldReset) {
             this.setState(prevState => {
                 const fields = prevState.fields;
@@ -42,6 +46,7 @@ export default class Form extends Component{
                 return {fields, shouldReset};
             })
         }
+        return null;
     }
 
     // Initialization helper functions
@@ -63,10 +68,6 @@ export default class Form extends Component{
             filterByField: null
         };
 
-        // if (field.type === 'select') {
-        //     field.options.filterByField = null;
-        // }
-
         if (field.options) {
             Object.keys(options).forEach(option => {
                 if (field.options[option]) {
@@ -80,23 +81,41 @@ export default class Form extends Component{
 
     // Form Interaction Functions
 
-    fieldChanged = (event, field, fieldIndex) => {
+    fieldChanged = (event, field) => {
         console.log(`[fieldChanged]`);
         
-        const fields = this.state.fields;
+        const fields = [...this.state.fields];
+        const currentFieldIdx = this.state.currentField;
         const formatter = field.options.formatter;
         const formatOn = field.options.formatOn;
         
         if (field.type === 'input' && event.type === formatOn) {
-            console.log(`input changed`);
             field.value = formatter(event.target.value);
         } else {
             field.value = event.target.value;
         }
-        
-        fields[fieldIndex] = field;
 
-        this.setState({fields, currentSection: this.nextSection(fieldIndex)});
+        const changedFieldIdx = this.getFieldIndex(field.name);
+
+        if (changedFieldIdx < currentFieldIdx) {
+            const currentSection = this.state.currentSection;
+            for (let i = currentFieldIdx; i < fields.length; i++) {
+                if (fields[i].section !== currentSection) { break; }
+                fields[i].value = "";
+            }
+        }
+        
+        fields[field.id] = field;
+        this.setState({
+            fields, 
+            currentSection: this.nextSection(field.id),
+            currentField: field.id
+        });
+    }
+
+    getFieldIndex = name => {
+        const indices = {...this.state.indices};
+        return indices[name];
     }
 
     nextSection = (currentIndex) => {
@@ -106,35 +125,42 @@ export default class Form extends Component{
 
         if (nextField.section > currentSection) {
             return nextField.section;
+        } else if (!this.isFieldRequired(nextField)) {
+            return nextField.section + 1;
         }
         return currentSection;
     }
 
-    isFieldVisible = (field) => {
-        console.log(`\n[isFieldVisible]`);
+    isFieldRequired = field => {
+        if (!field.options.isRequired) { return false }
+        return field.options.isRequired.every(check => {
+            const dependentField = this.state.fields[check.id];
+            return check.callback(dependentField.value);
+        })
+    }
+
+    isFieldVisible = field => {
         return field.options.isVisible.every(check => {
             if (!check.id) return true;
-
             const dependentField = this.state.fields[check.id];
-            console.log(dependentField);
             return check.callback(dependentField.value);
         });
     }
 
     filterFieldItems = field => {
         console.log(`\n[filterFieldItems]`);
-        const filterField_id = field.options.filterByField.id
-        const filterValue = this.state.fields[filterField_id].value;
+        const filterField_id = field.options.filterByField.id;
+        const fieldFilterValue = this.state.fields[filterField_id].value;
         const callback = field.options.filterByField.callback;
 
-        console.log(field);
-
-        field.items.filter(item => callback(filterValue, item.filterValue) ? item : null);
+        let filtered = field.items.filter(item => callback(item, fieldFilterValue));
+        console.log(filtered);
+        return filtered;
     }
 
     submitForm = async () => {
         let submitValues = {};
-        const fields = this.state.fields;
+        const fields = [...this.state.fields];
 
         fields.forEach(field => {
             submitValues[field.name] = field.value;
@@ -158,25 +184,26 @@ export default class Form extends Component{
 
     render() {
         console.log(`[render]`);
-        let fields = [];
         let currentSection = this.state.currentSection;
 
-        this.state.fields.forEach((field, index) => {
-            if (field.section <= currentSection) {
-                const isVisible = this.isFieldVisible(field);
-                console.log(``);
-                if (field.options.filterByField) {
-                    console.log(`filter ${field.name} by field`);
-                    console.log(field);
-                    field.items = this.filterFieldItems(field);
+        let fields = this.state.fields.map((field, index) => {
+            const tempField = {...field}
+            if (tempField.section <= currentSection) {
+                const isVisible = this.isFieldVisible(tempField);
+                if (isVisible) {
+                    if (tempField.options.filterByField) {
+                        tempField.items = this.filterFieldItems(tempField);
+                    }
+                    
+                    console.log(tempField);
+
+                    return (
+                        <Field 
+                            key={index}
+                            field={tempField}
+                            changed={(e) => this.fieldChanged(e, tempField, index)} />
+                    );
                 }
-                isVisible ? fields.push(
-                    <Field 
-                        key={index}
-                        field={field}
-                        changed={(e) => this.fieldChanged(e, field, index)} />
-                )
-                : null;
             }
         });
 

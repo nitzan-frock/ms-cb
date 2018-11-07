@@ -38,7 +38,6 @@ const field = (props) => {
             break;
         
         case 'radio':
-            console.log('radio');
             field = (
                 <Radio
                     legend={props.field.legend}

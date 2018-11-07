@@ -1,9 +1,7 @@
 import React from 'react';
 
 const radio = (props) => {
-    console.log(props);
     const radioButtons = props.buttons.map((button, index) => {
-        console.log(`is ${button.value} checked? ${props.value === button.value}`);
         return (
             <div key={index}>
                 <input 

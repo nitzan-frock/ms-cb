@@ -12,11 +12,12 @@ import Form from '../../../../UI/form/form';
 
 import './machinesOrganizer.scss';
 
-// CARD TYPES
-const LOCATION = 'LOCATION';
-const ZONE = 'ZONE';
-const DATAHUB = 'DATAHUB';
-const MACHINE_CARDS = 'MACHINE';
+// CARD, MODAL, AND DATA TYPES
+const LOCATION = 'location';
+const ZONE = 'zone';
+const DATAHUB = 'datahub';
+const MACHINE = 'machine';
+const SENSOR = 'sensor';
 
 export default class MachinesOrganizer extends Component {
     constructor(props) {
@@ -124,8 +125,8 @@ export default class MachinesOrganizer extends Component {
         if (toShow === DATAHUB || this.state.childOfLocation === DATAHUB) {
             const datahubs = await DataTools.getDatahubs({ company_id: this.props.activeCompany.id });
             this.setState({
-                datahubs: await datahubs,
-                machines: await machines,
+                datahubs: datahubs,
+                machines: machines,
                 showCardType: DATAHUB,
                 childOfLocation: DATAHUB,
                 currentLocation: location,
@@ -146,12 +147,12 @@ export default class MachinesOrganizer extends Component {
 
     enterZone = async zone => {
         const machines = this.state.machines.filter(machine => machine.zoneId === zone.id ? machine : null);
-        this.setState({ machines, currentZone: zone, showCardType: MACHINE_CARDS })
+        this.setState({ machines, currentZone: zone, showCardType: MACHINE })
     }
 
     enterDatahub = async datahub => {
         const machines = this.state.machines.filter(machine => machine.datahubSerial === datahub.serial ? machine : null);
-        this.setState({ machines, currentDatahub: datahub, showCardType: MACHINE_CARDS })
+        this.setState({ machines, currentDatahub: datahub, showCardType: MACHINE })
     }
 
     editMachine = async machine => {
@@ -163,9 +164,9 @@ export default class MachinesOrganizer extends Component {
         let zone_id;
         let datahub_serial;
 
-        if (container.dataType === 'location') location_id = container.id;
-        else if (container.dataType === 'zone') zone_id = container.id;
-        else if (container.dataType === 'datahub') datahub_serial = container.serial;
+        if (container.dataType === LOCATION) location_id = container.id;
+        else if (container.dataType === ZONE) zone_id = container.id;
+        else if (container.dataType === DATAHUB) datahub_serial = container.serial;
 
         return await DataTools.getMachines({ location_id, zone_id, datahub_serial });
     }
@@ -258,7 +259,7 @@ export default class MachinesOrganizer extends Component {
 
         let modal = null;
         switch (this.state.modal) {
-            case 'location':
+            case LOCATION:
                 const newLocationFields = [
                     {
                         section: 1,
@@ -286,16 +287,19 @@ export default class MachinesOrganizer extends Component {
                     </Modal>
                 );
                 break;
-            case 'onboardSensor':
+            case SENSOR:
                 const sensors = this.state.sensors.map(sensor => {
-                    return { value: sensor.serial, displayName: sensor.serial }
+                    return { value: sensor.serial, displayName: sensor.serial } 
                 });
-                console.log(`[machineOrganizer]`);
-                console.log(this.state.machines);
+                const machineTemplates = [
+                    {value: "motorsense", displayName: "MotorSense", filterValue: "pa"},
+                    {value: "energysense", displayName: "EnergySense", filterValue: "pa"},
+                    {value: "heatersense", displayName: "HeaterSense", filterValue: "pa"},
+                    {value: "vacuum-pump", displayName: "Vacuum Pump", filterValue: "vpa"},
+                    {value: "component-analyzer", displayName: "Component Analyzer", filterValue: "ca"},
+                ]
 
                 const isNewMachine = val => {
-                    console.log(`isNewMachine`);
-                    console.log(val);
                     return val === "new";
                 }
 
@@ -303,17 +307,37 @@ export default class MachinesOrganizer extends Component {
                     return val === "existing";
                 }
 
-                const isVPAorCA = val => {
-                    return val.match(/ca|vpa/i) ? true : false;
+                const isCA = val => {
+                    return val.match(/^ca/i) ? true : false;
+                }
+
+                const isVPA = val => {
+                    return val.match(/^vpa/i) ? true : false;
+                }
+
+                const isPA = val => {
+                    return val.match(/^pa/i) ? true : false;
                 }
 
                 const isZoneSelected = val => {
                     return val ? true : false;
                 }
 
-                const filterByZone = (val, zone_id) => {
-                    return val === zone_id ? val : null;
+                const filterByZone = (item, val) => {
+                    return val === item.filterValue.toString() ? item : null;
                 }
+
+                const filterBySensorType = (item, val) => {
+                    console.log(val);
+                    if (isVPA(val) && isVPA(item.filterValue)) {
+                        return item;
+                    } else if (isCA(val) && isCA(item.filterValue)) {
+                        return item;
+                    } else if (isPA(val) && isPA(item.filterValue)) {
+                        return item;
+                    }
+                    return null;
+                } 
 
                 const onboardSensorFields = [
                     {
@@ -321,6 +345,7 @@ export default class MachinesOrganizer extends Component {
                         id: 0,
                         type: "select",
                         name: "sensor",
+                        defaultValue: "Select Available Sensor",
                         items: sensors
                     },
                     {
@@ -335,29 +360,31 @@ export default class MachinesOrganizer extends Component {
                         ]
                     },
                     {
-                        section: 2,
+                        section: 1,
                         id: 2,
                         type: "select",
                         name: "zone",
+                        defaultValue: "Choose a Zone",
                         items: this.state.zones.map(zone => {
                             return {value: zone.id, displayName: zone.displayName};
                         })
                     },
                     {
-                        section: 2,
+                        section: 1,
                         id: 3,
                         type: "input",
                         name: "newMachine",
                         maxLength: 20,
                         placeholder: "Machine Name",
                         options: {
-                            isVisible: [{callback: isNewMachine, id: 1}]
+                            isVisible: [{callback: isNewMachine, id: 1, parent: "machineType"}]
                         }
                     },
                     {
-                        section: 2,
+                        section: 1,
                         id: 4,
                         type: "select",
+                        defaultValue: "Choose a Machine",
                         name: "existingMachine",
                         items: this.state.machines.map(machine => {
                             return {
@@ -367,18 +394,31 @@ export default class MachinesOrganizer extends Component {
                             }
                         }),
                         options: {
-                            isVisible: [{callback: isExistingMachine, id: 1}, {callback: isZoneSelected, id: 2}],
-                            filterByField: {callback: filterByZone, id: 2}
+                            isVisible: [{callback: isExistingMachine, id: 1, parent: "machineType"}, {callback: isZoneSelected, id: 2, parent:"zone"}],
+                            filterByField: {callback: filterByZone, id: 2, parent: "zone"}
                         }
                     },
                     {
-                        section: 3,
+                        section: 1,
                         id: 5,
                         type: "select",
                         name: "datahub",
-                        items: this.state.datahubs,
+                        items: this.state.datahubs.filter(datahub => {
+                            if (datahub.machines.length < 2) { return datahub }
+                        }),
                         options: {
-                            isVisible: [{sensor: isVPAorCA}]
+                            isRequired: [{callback: val => (isCA(val) || isVPA(val)), id: 1, parent: "machineType"}],
+                            isVisible: [{callback: val => (isCA(val) || isVPA(val)), id: 1, parent: "machineType"}]
+                        }
+                    },
+                    {
+                        section: 1,
+                        id: 6,
+                        type: "select",
+                        name: "machineTemplate",
+                        items: machineTemplates,
+                        options: {
+                            filterByField: {callback: filterBySensorType, id: 0, parent: "sensor"}
                         }
                     }
                 ];
@@ -393,7 +433,7 @@ export default class MachinesOrganizer extends Component {
                     </Modal>
                 );
                 break;
-            case 'zone': 
+            case ZONE: 
                 const newZoneFields = [
                     {
                         section: 1,
@@ -421,7 +461,7 @@ export default class MachinesOrganizer extends Component {
                     </Modal>
                 );
                 break;
-            case 'datahub':
+            case DATAHUB:
                 let datahubs = this.state.datahubs.filter(datahub => {
                     if (!datahub.locationId) {
                         return datahub;
@@ -497,8 +537,8 @@ export default class MachinesOrganizer extends Component {
                 childSelection = (
                     <div>
                         <span>Zones</span>
-                        <Button clicked={() => this.showModal('zone')}>Add Zone</Button>
-                        <Button clicked={() => this.showModal('onboardSensor')} >Onboard Sensor</Button>
+                        <Button clicked={() => this.showModal(ZONE)}>Add Zone</Button>
+                        <Button clicked={() => this.showModal(SENSOR)} >Onboard Sensor</Button>
                         {modal}
                     </div>
                 );
@@ -506,7 +546,7 @@ export default class MachinesOrganizer extends Component {
                 childSelection = (
                     <div>
                         <span>Datahubs</span>
-                        <Button clicked={() => this.showModal('datahub')}>Add Datahub</Button>
+                        <Button clicked={() => this.showModal(DATAHUB)}>Add Datahub</Button>
                         {modal}
                     </div>
                 );
@@ -515,7 +555,7 @@ export default class MachinesOrganizer extends Component {
             locationSelection = (
                 <div>
                     <span>Locations</span>
-                    <Button clicked={() => this.showModal('location')} >Add Location</Button>
+                    <Button clicked={() => this.showModal(LOCATION)} >Add Location</Button>
                     {modal}
                 </div>
             );
@@ -530,7 +570,7 @@ export default class MachinesOrganizer extends Component {
 
         if (this.state.showCardType === ZONE) {
             cards = <ZoneCards zones={this.state.zones} enterZone={this.enterZone} />;
-        } else if (this.state.showCardType === MACHINE_CARDS) {
+        } else if (this.state.showCardType === MACHINE) {
             cards = <MachineCards machines={this.state.machines} editMachine={this.editMachine} />
         } else if (this.state.showCardType === DATAHUB) {
             cards = (

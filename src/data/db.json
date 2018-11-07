@@ -163,7 +163,7 @@
       "id": 2,
       "companyId": 2,
       "displayName": "building 1",
-      "datahubCount": 4,
+      "datahubCount": 5,
       "zoneCount": 4
     },
     {
@@ -224,7 +224,7 @@
       "companyId": 2,
       "locationId": 2,
       "displayName": "zone 1",
-      "machineCount": 3
+      "machineCount": 2
     },
     {
       "dataType": "zone",

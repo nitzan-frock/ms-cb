@@ -247,8 +247,11 @@ export default class MachinesOrganizer extends Component {
     // Onboard sensor to a machine
     onboardSensor = async formValues => {
         const company_id = this.props.activeCompany.id;
-        const sensor_id = formValues.sensor;
-        const datahub_id = formValues.datahub;
+        const sensorSerial = formValues.sensor;
+        const datahubSerial = formValues.datahub;
+
+        const sensor_id = this.state.sensors.filter(sensor => sensor.id === sensorSerial ? sensor : null)[0];
+        const datahub_id = this.state.datahubs.filter(datahub => datahub.serial === datahubSerial ? datahub : null)[0];
 
         const datahub = this.state.datahubs.filter(datahub => {
             return Object.keys(formValues)
@@ -313,7 +316,7 @@ export default class MachinesOrganizer extends Component {
                 break;
             case SENSOR:
                 const sensors = this.state.sensors.map(sensor => {
-                    return { value: sensor.id, displayName: sensor.serial } 
+                    return { value: sensor.serial, displayName: sensor.serial } 
                 });
                 const machineTemplates = [
                     {value: "motorsense", displayName: "MotorSense", filterValue: "pa"},

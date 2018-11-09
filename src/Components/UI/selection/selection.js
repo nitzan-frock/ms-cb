@@ -2,7 +2,7 @@ import React from 'react';
 import uuid from 'uuid/v1';
 import PropTypes from 'prop-types';
 
-const selection = (props) => {    
+const selection = (props) => {
     return (
         <select
             value={props.value ? props.value : props.defaultValue}

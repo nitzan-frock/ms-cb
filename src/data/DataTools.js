@@ -156,7 +156,7 @@ export default class DataTools {
             }
             return {ok: true, body: "success"};
         } else {
-            const invalidFields = this._resolveInvalidFields({serial, mac}, inventory);
+            const invalidFields = this._resolveInvalidFieldsForItemRegistration({serial, mac}, inventory);
             return {ok: false, body: invalidFields};
         }
     }
@@ -184,6 +184,12 @@ export default class DataTools {
         await this._putData((url + putItem.id), putItem);
     }
 
+     /******************************************************************
+     *
+     * Functions for Item and Field Validation
+     *  
+     ******************************************************************/
+
     static _isItemValid({serial, mac}, inventory) {
         return inventory.some(item => {
             return item.companyId === null && 
@@ -192,7 +198,7 @@ export default class DataTools {
         });
     }
 
-    static _resolveInvalidFields(fields, inventory) {
+    static _resolveInvalidFieldsForItemRegistration(fields, inventory) {
         const emptyFields = this._checkEmptyFields(fields);
         if (emptyFields) {return emptyFields};
 
@@ -242,6 +248,11 @@ export default class DataTools {
         return {invalidFields, message: "The marked fields do not match our records."};
     }
 
+    static async isSensorAssigned (company_id, serial) {
+        const sensors = await this.getSensors({company_id});
+        return sensors.some(sensor => sensor.serial === serial);
+    }
+
     /******************************************************************
      *
      * Add new locations, zones, machines
@@ -278,6 +289,10 @@ export default class DataTools {
             return {ok: true, body: "success"};
         }
         return {ok: false, body: "Failed to add zone."}
+    }
+
+    static async addNewMachine(displayName, company_id, location_id, zone_id, sensorSerial, datahubSerial) {
+        const sensors = await this.getSensors({company_id});
     }
 
     /******************************************************************

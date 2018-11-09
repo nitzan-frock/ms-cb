@@ -64,7 +64,7 @@ export default class Form extends Component{
         const options = {
             formatter: input => input,
             formatOn: 'change',
-            isVisible: [{callback: () => true, id: null}],
+            dependencies: [],
             filterByField: null
         };
 
@@ -82,82 +82,96 @@ export default class Form extends Component{
     // Form Interaction Functions
 
     fieldChanged = (event, field) => {
-        console.log(`[fieldChanged]`);
-        
         const fields = [...this.state.fields];
         const currentFieldIdx = this.state.currentField;
+        const changedFieldIdx = this.getFieldIndex(field.name);
         const formatter = field.options.formatter;
         const formatOn = field.options.formatOn;
         
         if (field.type === 'input' && event.type === formatOn) {
-            field.value = formatter(event.target.value);
+            fields[changedFieldIdx].value = formatter(event.target.value);
         } else {
-            field.value = event.target.value;
+            fields[changedFieldIdx].value = event.target.value;
         }
 
-        const changedFieldIdx = this.getFieldIndex(field.name);
-
-        if (changedFieldIdx < currentFieldIdx) {
+        if (currentFieldIdx > changedFieldIdx) {
             const currentSection = this.state.currentSection;
             for (let i = currentFieldIdx; i < fields.length; i++) {
                 if (fields[i].section !== currentSection) { break; }
-                fields[i].value = "";
+                if (this.isFieldDependency(fields[i].options.dependencies, field)) {
+                    fields[i].value = "";
+                }
             }
         }
         
-        fields[field.id] = field;
         this.setState({
             fields, 
-            currentSection: this.nextSection(field.id),
-            currentField: field.id
+            currentSection: this.changeSection(changedFieldIdx),
+            currentField: changedFieldIdx
         });
     }
 
     getFieldIndex = name => {
-        const indices = {...this.state.indices};
+        const indices = this.state.indices;
         return indices[name];
     }
 
-    nextSection = (currentIndex) => {
+    changeSection = (currentIndex) => {
         const fields = this.state.fields;
         const currentSection = this.state.currentSection;
         const nextField = fields[currentIndex + 1];
 
-        if (nextField.section > currentSection) {
+        if (!nextField || nextField.section === currentSection) {
+            return currentSection;
+        } else if (nextField.section > currentSection) {
             return nextField.section;
-        } else if (!this.isFieldRequired(nextField)) {
+        } else if (!this.isDependencyMet(nextField)) {
             return nextField.section + 1;
         }
-        return currentSection;
     }
 
-    isFieldRequired = field => {
-        if (!field.options.isRequired) { return false }
-        return field.options.isRequired.every(check => {
-            const dependentField = this.state.fields[check.id];
-            return check.callback(dependentField.value);
-        })
+    /**
+     *  TODO: ADD TO PROPTYPES:
+     *  @param field.options.dependencies - must be an array with objects of 
+     *      {
+     *          callback: func returns a boolean,
+     *          name: name of the field as a dependency
+     *      }
+     */
+    isDependencyMet = dependent => {
+        if (!dependent.options.dependencies.length) { return true } 
+        return dependent.options.dependencies.every(dependency => {
+            const index = this.getFieldIndex(dependency.name);
+            const dependencyField = this.state.fields[index];
+            return dependency.callback(dependencyField.value);
+        });
     }
 
-    isFieldVisible = field => {
-        return field.options.isVisible.every(check => {
-            if (!check.id) return true;
-            const dependentField = this.state.fields[check.id];
-            return check.callback(dependentField.value);
+    isFieldDependency = (dependencies, field) => {
+        return dependencies.some(dependency => {
+            return dependency.name === field.name;
         });
     }
 
     filterFieldItems = field => {
-        console.log(`\n[filterFieldItems]`);
-        const filterField_id = field.options.filterByField.id;
-        const fieldFilterValue = this.state.fields[filterField_id].value;
+        //console.log(`\n[filterFieldItems]`);
+        const filterField = field.options.filterByField.name;
+        const fieldFilterValue = this.state.fields[this.getFieldIndex(filterField)].value;
         const callback = field.options.filterByField.callback;
 
-        let filtered = field.items.filter(item => callback(item, fieldFilterValue));
-        console.log(filtered);
-        return filtered;
+        return field.items.filter(item => callback(item, fieldFilterValue));;
     }
 
+    /**
+     * Expected return from props.submitForm:
+     * {
+     *      ok: boolean,
+     *      body: {
+     *          message: String,
+     *          invalidFields: array of Strings - names of fields that are invalid
+     *      }
+     * }
+     */
     submitForm = async () => {
         let submitValues = {};
         const fields = [...this.state.fields];
@@ -183,20 +197,17 @@ export default class Form extends Component{
     }
 
     render() {
-        console.log(`[render]`);
         let currentSection = this.state.currentSection;
 
         let fields = this.state.fields.map((field, index) => {
             const tempField = {...field}
             if (tempField.section <= currentSection) {
-                const isVisible = this.isFieldVisible(tempField);
+                const isVisible = this.isDependencyMet(tempField);
                 if (isVisible) {
                     if (tempField.options.filterByField) {
                         tempField.items = this.filterFieldItems(tempField);
                     }
                     
-                    console.log(tempField);
-
                     return (
                         <Field 
                             key={index}

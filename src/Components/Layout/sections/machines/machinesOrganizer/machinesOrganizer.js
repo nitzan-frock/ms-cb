@@ -246,7 +246,31 @@ export default class MachinesOrganizer extends Component {
 
     // Onboard sensor to a machine
     onboardSensor = async formValues => {
+        const company_id = this.props.activeCompany.id;
+        const sensor_id = formValues.sensor;
+        const datahub_id = formValues.datahub;
 
+        const datahub = this.state.datahubs.filter(datahub => {
+            return Object.keys(formValues)
+                .map(key => datahub[key] === formValues[key] ? datahub : null)
+                .reduce((prev, curr) => prev ? prev : curr);
+        })[0];
+
+        try {
+            const response = await DataTools.updateDatahub(datahub, 'add',
+                { location: this.state.currentLocation }
+            );
+            if (!response.ok) {
+                throw response;
+            }
+
+            const datahubs = await DataTools.getDatahubs({ company_id });
+            this.setState({ datahubs });
+            return response;
+        }
+        catch (err) {
+            return err;
+        }
     }
 
 
@@ -289,7 +313,7 @@ export default class MachinesOrganizer extends Component {
                 break;
             case SENSOR:
                 const sensors = this.state.sensors.map(sensor => {
-                    return { value: sensor.serial, displayName: sensor.serial } 
+                    return { value: sensor.id, displayName: sensor.serial } 
                 });
                 const machineTemplates = [
                     {value: "motorsense", displayName: "MotorSense", filterValue: "pa"},
@@ -350,6 +374,18 @@ export default class MachinesOrganizer extends Component {
                     },
                     {
                         section: 1,
+                        id: 6,
+                        type: "select",
+                        name: "machineTemplate",
+                        defaultValue: "Select Machine Template",
+                        items: machineTemplates,
+                        options: {
+                            dependencies: [{callback: val => val ? true : false, id: 1, name: "sensor"}],
+                            filterByField: {callback: filterBySensorType, id: 0, name: "sensor"}
+                        }
+                    },
+                    {
+                        section: 1,
                         id: 1,
                         type: "radio",
                         name: "machineType",
@@ -377,7 +413,7 @@ export default class MachinesOrganizer extends Component {
                         maxLength: 20,
                         placeholder: "Machine Name",
                         options: {
-                            isVisible: [{callback: isNewMachine, id: 1, parent: "machineType"}]
+                            dependencies: [{callback: isNewMachine, id: 1, name: "machineType"}]
                         }
                     },
                     {
@@ -394,8 +430,11 @@ export default class MachinesOrganizer extends Component {
                             }
                         }),
                         options: {
-                            isVisible: [{callback: isExistingMachine, id: 1, parent: "machineType"}, {callback: isZoneSelected, id: 2, parent:"zone"}],
-                            filterByField: {callback: filterByZone, id: 2, parent: "zone"}
+                            dependencies: [
+                                {callback: isExistingMachine, id: 1, name: "machineType"}, 
+                                {callback: isZoneSelected, id: 2, name:"zone"}
+                            ],
+                            filterByField: {callback: filterByZone, id: 2, name: "zone"}
                         }
                     },
                     {
@@ -407,18 +446,7 @@ export default class MachinesOrganizer extends Component {
                             if (datahub.machines.length < 2) { return datahub }
                         }),
                         options: {
-                            isRequired: [{callback: val => (isCA(val) || isVPA(val)), id: 1, parent: "machineType"}],
-                            isVisible: [{callback: val => (isCA(val) || isVPA(val)), id: 1, parent: "machineType"}]
-                        }
-                    },
-                    {
-                        section: 1,
-                        id: 6,
-                        type: "select",
-                        name: "machineTemplate",
-                        items: machineTemplates,
-                        options: {
-                            filterByField: {callback: filterBySensorType, id: 0, parent: "sensor"}
+                            dependencies: [{callback: val => (isCA(val) || isVPA(val)), id: 1, name: "machineType"}]
                         }
                     }
                 ];

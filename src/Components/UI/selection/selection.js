@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 const selection = (props) => {
     return (
         <select
+            className={props.styleClass}
             value={props.value ? props.value : props.defaultValue}
             onChange={props.changed}>
             {props.defaultValue ? <option disabled>{props.defaultValue}</option> : null}

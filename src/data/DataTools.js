@@ -186,7 +186,7 @@ export default class DataTools {
 
      /******************************************************************
      *
-     * Functions for Item and Field Validation
+     * Helper Functions for Item and Field Validation
      *  
      ******************************************************************/
 
@@ -293,6 +293,61 @@ export default class DataTools {
 
     static async addNewMachine(displayName, company_id, location_id, zone_id, sensorSerial, datahubSerial) {
         const sensors = await this.getSensors({company_id});
+    }
+
+    /******************************************************************
+     *
+     * Onboard Sensor to Machine
+     * Step 1:  check that sensor is not already assigned to a machine, if it is ask to move 
+     *          it to the new machine.
+     * Step 2:  if CA or VPA check that datahub machines array is less than 2.
+     * Step 3:  if new machine, create it, else if existing, check if it is assigned a sensor, if it is
+     *          assigned, ask if you want to assign the new sensor to replace the old one
+     *  
+     ******************************************************************/
+
+    static async onboardSensor({company_id, sensor, datahub, newMachineName, existingMachine}) {
+        console.log(!sensor.machineId);
+        if (sensor.machineId) {
+            console.log('sensor already has a machine');
+            const message = `This sensor, ${sensor.serial}, has already been onboarded. \nWould you like to replace its machine?`;
+            if (!confirm(message)) {
+                return {
+                    ok: false, 
+                    body: {
+                        invalidFields: ["sensor"], 
+                        message: "The sensor is already paired with a machine."
+                    }
+                };
+
+            } else {
+                alert("Replace the sensor.");
+            }
+        }
+        if (existingMachine.sensorSerial) {
+            console.log('machine is already paired to a sensor');
+            const message = `The existing machine has the sensor: ${existingMachine.sensorSerial}. \nWould you like to replace it with the selected sensor?`;
+            if (!confirm(message)) {
+                return {
+                    ok: false, 
+                    body: {
+                        invalidFields: ["existingMachine"], 
+                        message: "The sensor is already paired with a machine."
+                    }
+                }
+            } else {
+                alert("Replace the sensor.");
+            }
+        }
+        if (datahub.machines.length > 1) {
+            return {
+                ok: false,
+                body: {
+                    invalidFields: ["datahub"],
+                    message: "The datahub has the maximum amount of sensors paired."
+                }
+            }
+        }
     }
 
     /******************************************************************

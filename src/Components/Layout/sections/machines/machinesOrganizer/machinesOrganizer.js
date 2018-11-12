@@ -244,25 +244,43 @@ export default class MachinesOrganizer extends Component {
         }
     }
 
-    // Onboard sensor to a machine
+    /**
+     * Onboard sensor to a machine.
+     * step 1:  check that sensor is not already assigned to a machine, if it is 
+     * step 2:  if CA or VPA check that datahub machines array is less than 2.
+     * step 3:  if new machine, create it, else if existing, check if it is assigned a sensor, if it is
+     *          assigned, ask if you want to assign the new sensor to replace the old one
+     */
     onboardSensor = async formValues => {
         const company_id = this.props.activeCompany.id;
         const sensorSerial = formValues.sensor;
         const datahubSerial = formValues.datahub;
+        const newMachineName = formValues.newMachine;
+        const existingMachine_id = parseInt(formValues.existingMachine);
+        console.log(existingMachine_id);
 
-        const sensor_id = this.state.sensors.filter(sensor => sensor.id === sensorSerial ? sensor : null)[0];
-        const datahub_id = this.state.datahubs.filter(datahub => datahub.serial === datahubSerial ? datahub : null)[0];
-
-        const datahub = this.state.datahubs.filter(datahub => {
-            return Object.keys(formValues)
-                .map(key => datahub[key] === formValues[key] ? datahub : null)
-                .reduce((prev, curr) => prev ? prev : curr);
+        const sensor = this.state.sensors.filter(sensor =>{
+            return sensor.serial === sensorSerial ? sensor : null;
         })[0];
-
+        const datahub = this.state.datahubs.filter(datahub => { 
+            return datahub.serial === datahubSerial ? datahub : null;
+        })[0];
+        const existingMachine = this.state.machines.filter(machine => { 
+            return machine.id === existingMachine_id ? machine : null;
+        })[0];
+        console.log(existingMachine);
         try {
-            const response = await DataTools.updateDatahub(datahub, 'add',
-                { location: this.state.currentLocation }
-            );
+            
+            const onboardObj = {
+                company_id,
+                sensor,
+                datahub,
+                newMachineName,
+                existingMachine
+            }
+
+            const response = await DataTools.onboardSensor(onboardObj);
+
             if (!response.ok) {
                 throw response;
             }
@@ -355,7 +373,6 @@ export default class MachinesOrganizer extends Component {
                 }
 
                 const filterBySensorType = (item, val) => {
-                    console.log(val);
                     if (isVPA(val) && isVPA(item.filterValue)) {
                         return item;
                     } else if (isCA(val) && isCA(item.filterValue)) {
@@ -369,7 +386,6 @@ export default class MachinesOrganizer extends Component {
                 const onboardSensorFields = [
                     {
                         section: 1,
-                        id: 0,
                         type: "select",
                         name: "sensor",
                         defaultValue: "Select Available Sensor",
@@ -377,19 +393,31 @@ export default class MachinesOrganizer extends Component {
                     },
                     {
                         section: 1,
-                        id: 6,
+                        type: "select",
+                        name: "datahub",
+                        defaultValue: "Select a datahub",
+                        items: this.state.datahubs.filter(datahub => {
+                            if (datahub.machines.length < 2) { return datahub }
+                        }),
+                        options: {
+                            dependencies: [
+                                {callback: val => (isCA(val) || isVPA(val)), name: "sensor"}
+                            ]
+                        }
+                    },
+                    {
+                        section: 1,
                         type: "select",
                         name: "machineTemplate",
                         defaultValue: "Select Machine Template",
                         items: machineTemplates,
                         options: {
-                            dependencies: [{callback: val => val ? true : false, id: 1, name: "sensor"}],
-                            filterByField: {callback: filterBySensorType, id: 0, name: "sensor"}
+                            dependencies: [{callback: val => val ? true : false, name: "sensor"}],
+                            filterByField: {callback: filterBySensorType, name: "sensor"}
                         }
                     },
                     {
                         section: 1,
-                        id: 1,
                         type: "radio",
                         name: "machineType",
                         legend: "Will this be a new or existing machine?",
@@ -400,7 +428,6 @@ export default class MachinesOrganizer extends Component {
                     },
                     {
                         section: 1,
-                        id: 2,
                         type: "select",
                         name: "zone",
                         defaultValue: "Choose a Zone",
@@ -410,18 +437,16 @@ export default class MachinesOrganizer extends Component {
                     },
                     {
                         section: 1,
-                        id: 3,
                         type: "input",
                         name: "newMachine",
                         maxLength: 20,
                         placeholder: "Machine Name",
                         options: {
-                            dependencies: [{callback: isNewMachine, id: 1, name: "machineType"}]
+                            dependencies: [{callback: isNewMachine, name: "machineType"}]
                         }
                     },
                     {
                         section: 1,
-                        id: 4,
                         type: "select",
                         defaultValue: "Choose a Machine",
                         name: "existingMachine",
@@ -434,22 +459,10 @@ export default class MachinesOrganizer extends Component {
                         }),
                         options: {
                             dependencies: [
-                                {callback: isExistingMachine, id: 1, name: "machineType"}, 
-                                {callback: isZoneSelected, id: 2, name:"zone"}
+                                {callback: isExistingMachine, name: "machineType"}, 
+                                {callback: isZoneSelected, name:"zone"}
                             ],
-                            filterByField: {callback: filterByZone, id: 2, name: "zone"}
-                        }
-                    },
-                    {
-                        section: 1,
-                        id: 5,
-                        type: "select",
-                        name: "datahub",
-                        items: this.state.datahubs.filter(datahub => {
-                            if (datahub.machines.length < 2) { return datahub }
-                        }),
-                        options: {
-                            dependencies: [{callback: val => (isCA(val) || isVPA(val)), id: 1, name: "machineType"}]
+                            filterByField: {callback: filterByZone, name: "zone"}
                         }
                     }
                 ];

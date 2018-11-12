@@ -139,7 +139,7 @@ export default class Form extends Component{
      *      }
      */
     isDependencyMet = dependent => {
-        if (!dependent.options.dependencies.length) { return true } 
+        if (!dependent.options.dependencies.length) { return true }
         return dependent.options.dependencies.every(dependency => {
             const index = this.getFieldIndex(dependency.name);
             const dependencyField = this.state.fields[index];
@@ -184,11 +184,14 @@ export default class Form extends Component{
 
         if (!response.ok) {
             response.body.invalidFields.forEach(invalidField => {
-                fields.forEach(field => {
-                    if (field.name === invalidField) {
-                        field.isValid = false;
-                    }
-                });
+                const invalidIdx = this.getFieldIndex(invalidField);
+                fields[invalidIdx].isValid = false;
+                // fields.forEach(field => {
+                //     if (field.name === invalidField) {
+                //         console.log(`invalid: ${field.name}`);
+                //         field.isValid = false;
+                //     }
+                // });
             });
             this.setState({fields, message: response.body.message});
         } else {

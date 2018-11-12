@@ -17,7 +17,7 @@ const radio = (props) => {
     });
 
     return (
-        <fieldset>
+        <fieldset className={props.styleClass}>
             <legend>
                 {props.legend}
             </legend>

@@ -8,12 +8,15 @@ import './field.scss';
 const field = (props) => {
     //console.log(`[field]`);
     let field = null;
+    let styleClass = [];
+    if (!props.field.isValid){
+        styleClass.push("invalid");
+    }
+
     switch (props.field.type) {
         case 'input':
-            let styleClass = ["input"];
-            if (!props.field.isValid){
-                styleClass.push("invalid");
-            }
+            styleClass.push("input");
+            
             field = (
                 <input 
                     className={styleClass.join(" ")}
@@ -29,6 +32,7 @@ const field = (props) => {
         case 'select':
             field = (
                 <Selection 
+                    styleClass={styleClass.join(" ")}
                     items={props.field.items}
                     defaultValue={props.field.defaultValue}
                     value={props.field.value}
@@ -40,6 +44,7 @@ const field = (props) => {
         case 'radio':
             field = (
                 <Radio
+                    styleClass={styleClass.join(" ")}
                     legend={props.field.legend}
                     buttons={props.field.items}
                     value={props.field.value}

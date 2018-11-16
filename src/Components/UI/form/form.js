@@ -52,7 +52,7 @@ export default class Form extends Component{
     // Initialization helper functions
 
     buildFieldProps = props => {
-        props.options = this.setFieldOptions(props);
+        props.options = this.makeFieldOptions(props);
         return {
             ...props,
             value: "",
@@ -60,7 +60,7 @@ export default class Form extends Component{
         };
     }
 
-    setFieldOptions = field => {
+    makeFieldOptions = field => {
         const options = {
             formatter: input => input,
             formatOn: 'change',
@@ -163,7 +163,7 @@ export default class Form extends Component{
     }
 
     /**
-     * Expected return from props.submitForm:
+     * Expected return from props.submitForm callback:
      * {
      *      ok: boolean,
      *      body: {
@@ -186,12 +186,6 @@ export default class Form extends Component{
             response.body.invalidFields.forEach(invalidField => {
                 const invalidIdx = this.getFieldIndex(invalidField);
                 fields[invalidIdx].isValid = false;
-                // fields.forEach(field => {
-                //     if (field.name === invalidField) {
-                //         console.log(`invalid: ${field.name}`);
-                //         field.isValid = false;
-                //     }
-                // });
             });
             this.setState({fields, message: response.body.message});
         } else {
@@ -203,7 +197,7 @@ export default class Form extends Component{
         let currentSection = this.state.currentSection;
 
         let fields = this.state.fields.map((field, index) => {
-            const tempField = {...field}
+            const tempField = {...field};
             if (tempField.section <= currentSection) {
                 const isVisible = this.isDependencyMet(tempField);
                 if (isVisible) {

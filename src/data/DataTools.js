@@ -319,26 +319,38 @@ export default class DataTools {
                         message: "The sensor is already paired with a machine."
                     }
                 };
-
             } else {
-                alert("Replace the sensor.");
-            }
-        }
-        if (existingMachine.sensorSerial) {
-            console.log('machine is already paired to a sensor');
-            const message = `The existing machine has the sensor: ${existingMachine.sensorSerial}. \nWould you like to replace it with the selected sensor?`;
-            if (!confirm(message)) {
-                return {
-                    ok: false, 
-                    body: {
-                        invalidFields: ["existingMachine"], 
-                        message: "The sensor is already paired with a machine."
+                if (existingMachine.sensorSerial) {
+                    console.log('machine is already paired to a sensor');
+                    const message = `The existing machine has the sensor: ${existingMachine.sensorSerial}. \nWould you like to replace it with the selected sensor?`;
+                    if (!confirm(message)) {
+                        return {
+                            ok: false, 
+                            body: {
+                                invalidFields: ["existingMachine"], 
+                                message: "The sensor is already paired with a machine."
+                            }
+                        }
+                    } else {
+                        // find machine on the sensor that is being onboarded
+                        // remove the sensor from that machine
+                        // add the sensor being onboarded to the machine the user wants
+                        // update the sensor's machineId
+                        console.log(`replace sensor`);
+                        const pairedMachine = await this.getMachines({machine_id: sensor.machineId})[0];
+                        pairedMachine.sensorSerial = null;
+                        await this.updateMachine(pairedMachine);
+
+                        existingMachine.sensorSerial = sensor.serial;
+                        sensor.machineId = existingMachine.id;
+
+                        await this.updateMachine(existingMachine);
+                        await this.updateSensor(sensor);
                     }
                 }
-            } else {
-                alert("Replace the sensor.");
             }
         }
+        
         if (datahub.machines.length > 1) {
             return {
                 ok: false,
@@ -429,5 +441,21 @@ export default class DataTools {
             return {ok: true, body: "success"};
         }
         return {ok: false, body: "Failed to add datahub to location."}
-    }   
+    }
+
+    static async updateSensor(sensor) {
+        console.log(`update sensor`);
+        console.log(sensor);
+        const url = `http://localhost:8080/sensors/${sensor.id}`;
+        const response = await this._putData(url, sensor);
+        console.log(response);
+    }
+
+    static async updateMachine(machine) {
+        console.log(`update machine`);
+        console.log(machine);
+        const url = `http://localhost:8080/machines/${machine.id}`;
+        const response = await this._putData(url, machine);
+        console.log(response);
+    }
 }

@@ -26,7 +26,7 @@ export default class ItemInventory extends Component {
         });
     }
 
-    addNewItemHandler = async (itemValues) => {
+    registerNewItemHandler = async (itemValues) => {
         // add item on enter key press
         const company_id = this.props.activeCompany.id;
         const serial = itemValues.serial;
@@ -85,7 +85,7 @@ export default class ItemInventory extends Component {
                             <Form 
                                 fields={formFields}
                                 reset={!this.state.showModal}
-                                submitForm={this.addNewItemHandler}
+                                submitForm={this.registerNewItemHandler}
                                 invalidEntry={this.state.invalidEntry} />
                         </Modal>
                     )
@@ -93,7 +93,7 @@ export default class ItemInventory extends Component {
                 }
                 <Button clicked={this.showModalHandler}>Add New Item</Button>
                 <ItemList 
-                    company={this.props.activeCompany}
+                    {...this.props}
                     refresh={this.state.shouldListUpdate}
                     setShouldListUpdate={this.setShouldListUpdate} />
             </>

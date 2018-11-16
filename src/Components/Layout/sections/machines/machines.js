@@ -9,25 +9,47 @@ export default class Machines extends Component {
         super(props);
         this.state = {
             locations: [],
-            zones: [],
             machines: [],
             sensors: [],
-            datahubs: []
+            datahubs: [],
+            loading: true
         }
     }
 
     componentDidMount() {
         const company_id = this.props.activeCompany;
         const locations = await DataTools.getLocations({company_id});
-        const datahubs = await DataTools.getDatahubs({company_id})
+        const machines = await DataTools.getMachines({company_id});
+        const sensors = await DataTools.getSensors({company_id});
+        const datahubs = await DataTools.getDatahubs({company_id});
+        
+        this.setState({
+            locations,
+            machines,
+            sensors,
+            datahubs,
+            loading: false
+        });
     }
 
+    
+
     render() {
-        return (
-            <>
-                <ItemInventory {...this.props}/>
-                <MachinesOrganizer {...this.props} />
-            </>
+        return (this.state.loading 
+            ? <p>Loading...</p>
+            : (
+                <>
+                <ItemInventory {...this.props} 
+                    machines={this.state.machines} 
+                    sensors={this.state.sensors} 
+                    datahubs={this.state.datahubs}/>
+                <MachinesOrganizer {...this.props}
+                    locations={this.state.location}
+                    sensors={this.state.sensors}
+                    machines={this.state.machines}
+                    datahubs={this.state.datahubs} />
+                    </>
+            )
         );
     }
 }

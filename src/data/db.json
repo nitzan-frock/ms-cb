@@ -295,7 +295,7 @@
       "locationId": 3,
       "zoneId": 4,
       "displayName": "machine 3",
-      "sensorSerial": "pa-17-000049",
+      "sensorSerial": "pa-17-000123",
       "datahubSerial": ""
     },
     {
@@ -540,7 +540,8 @@
       "companyId": 2,
       "locationId": 3,
       "zoneId": 3,
-      "machineId": 4
+      "machineId": 3,
+      "location": "building 2"
     },
     {
       "dataType": "sensor",

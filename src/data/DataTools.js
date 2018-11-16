@@ -322,7 +322,7 @@ export default class DataTools {
             } else {
                 if (existingMachine.sensorSerial) {
                     console.log('machine is already paired to a sensor');
-                    const message = `The existing machine has the sensor: ${existingMachine.sensorSerial}. \nWould you like to replace it with the selected sensor?`;
+                    const message = `The existing machine has the sensor: ${existingMachine.sensorSerial}. \nWould you like to replace it with the selected sensor: ${sensor.serial}?`;
                     if (!confirm(message)) {
                         return {
                             ok: false, 
@@ -337,7 +337,8 @@ export default class DataTools {
                         // add the sensor being onboarded to the machine the user wants
                         // update the sensor's machineId
                         console.log(`replace sensor`);
-                        const pairedMachine = await this.getMachines({machine_id: sensor.machineId})[0];
+                        const pairedMachine = (await this.getMachines({machine_id: sensor.machineId}))[0];
+                        console.log(pairedMachine);
                         pairedMachine.sensorSerial = null;
                         await this.updateMachine(pairedMachine);
 

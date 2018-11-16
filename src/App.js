@@ -30,6 +30,8 @@ class App extends Component{
         this.setState({activeCompany, activeUser});
     }
 
+    componentDidUpdate
+
     tabClickedHandler = (name) => {
         this.setState({
             activeTab: name
@@ -43,7 +45,10 @@ class App extends Component{
                 <Header tabs={tabs} activeTab={this.state.activeTab} tabClicked={this.tabClickedHandler}/>
                 {
                     this.state.activeCompany 
-                    ? <Section activeTab={this.state.activeTab} activeUser={this.state.activeUser} activeCompany={this.state.activeCompany} />
+                    ? <Section 
+                        activeTab={this.state.activeTab} 
+                        activeUser={this.state.activeUser} 
+                        activeCompany={this.state.activeCompany} />
                     : null
                 }
             </div>
